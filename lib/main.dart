@@ -27,7 +27,7 @@ class _AppState extends State<App> {
 
   int currentPage = 0;
   static List<Widget> pages = [
-    TransactionsPage(),
+    const TransactionsPage(),
     const AccountsPage(),
     const BudgetsPage(),
     const ScheduledPage(),

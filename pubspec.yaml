@@ -1,10 +1,10 @@
 name: budget_master
-description: "A new Flutter project."
-publish_to: 'none'
+description: "Organize your finances."
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=3.2.3 <4.0.0'
+  sdk: ">=3.2.3 <4.0.0"
 
 dependencies:
   fan_side_drawer: ^1.0.2
