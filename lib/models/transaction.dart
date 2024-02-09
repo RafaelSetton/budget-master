@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'dart:core';
 
 import 'package:budget_master/models/enums.dart';
@@ -21,6 +21,7 @@ class Transaction {
 
   // For Expenses/Incomes
   Map<String, num>? categories;
+  String? payee;
 
   // For Buy's/Sell's
   num? nShares;
@@ -49,6 +50,18 @@ class Transaction {
     if (isBuySell) _pricePerShare = _totalValue / nShares!;
   }
 
+  Map<String, dynamic> display() {
+    return {
+      "Conta": accountPrimary,
+      "Valor": totalValue.toString(),
+      "Data": DateFormat('dd/MM/yyyy').format(dateTime),
+      "Descrição": description,
+      "Beneficiário": payee ?? "",
+      "Categoria(s)":
+          categories?.keys.reduce((value, element) => "$value, $element") ?? "",
+    };
+  }
+
   Transaction._main({
     required this.id,
     required this.edited,
@@ -62,6 +75,7 @@ class Transaction {
     this.accountSecondary,
     this.nShares,
     this.assetName,
+    this.payee,
     num? pricePerShare,
   })  : _totalValue = totalValue,
         _pricePerShare = pricePerShare;
@@ -76,6 +90,7 @@ class Transaction {
     required String accountPrimary,
     required Map<String, num> categories,
     required String description,
+    required String payee,
   }) {
     return Transaction._main(
       id: id,
@@ -87,6 +102,7 @@ class Transaction {
       totalValue: totalValue,
       accountPrimary: accountPrimary,
       categories: categories,
+      payee: payee,
     );
   }
 

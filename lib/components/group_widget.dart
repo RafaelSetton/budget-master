@@ -1,8 +1,11 @@
-import 'package:budget_master/components/highlight_button.dart';
+// ignore_for_file: curly_braces_in_flow_control_structures
+
+import 'package:budget_master/components/account_widget.dart';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:budget_master/utils/app_colors.dart';
+import 'package:budget_master/utils/consts.dart';
 import 'package:flutter/material.dart';
 
 class GroupWidget extends StatefulWidget {
@@ -34,7 +37,7 @@ class _GroupWidgetState extends State<GroupWidget> {
     });
   }
 
-  Widget colorBar(Color color) {
+  Widget colorBar() {
     return Container(
       decoration: BoxDecoration(
         color: data.color,
@@ -61,7 +64,7 @@ class _GroupWidgetState extends State<GroupWidget> {
                   : "${data.name.substring(0, 9)}...",
               style: TextStyle(
                 overflow: TextOverflow.clip,
-                color: AppColors.title,
+                color: AppColors.groupTitle,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -69,43 +72,8 @@ class _GroupWidgetState extends State<GroupWidget> {
           ),
           Text.rich(
             TextSpan(
-              style: TextStyle(color: AppColors.subtitle),
+              style: TextStyle(color: AppColors.groupSubtitle),
               text: "R\$ $totalBalance",
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget accountBuilder(Account acc) {
-    return HighlightButton(
-      defaultColor:
-          widget.selected == acc.id ? AppColors.iconsFocus : Colors.transparent,
-      hoverColor: AppColors.iconsFocus,
-      onPressed: () => widget.onSelect(acc.id),
-      onDoubleTap: () {
-        print("Edit");
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(width: 25),
-          Text(
-            acc.name,
-            style: TextStyle(color: AppColors.title),
-          ),
-          Expanded(
-              child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            color: AppColors.icons,
-            height: 1,
-          )),
-          Text(
-            "R\$ ${acc.balance}",
-            style: TextStyle(
-              color: acc.balance >= 0 ? Colors.green : Colors.red,
-              fontSize: 14,
             ),
           ),
         ],
@@ -116,7 +84,14 @@ class _GroupWidgetState extends State<GroupWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> columnChildren = [header()];
-    if (expand) columnChildren += accounts.map(accountBuilder).toList();
+    if (expand)
+      columnChildren += accounts
+          .map((acc) => AccountWidget(
+                data: acc,
+                onSelect: () => widget.onSelect(acc.id),
+                selected: widget.selected == acc.id,
+              ))
+          .toList();
 
     return Container(
       margin: const EdgeInsets.all(10),
@@ -124,12 +99,12 @@ class _GroupWidgetState extends State<GroupWidget> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            colorBar(Colors.red),
+            colorBar(),
             Container(
               padding: const EdgeInsets.all(10),
-              width: 250,
+              width: accGroupWidth,
               decoration: BoxDecoration(
-                color: AppColors.secondBackground,
+                color: AppColors.groupBackground,
                 borderRadius:
                     const BorderRadius.horizontal(right: Radius.circular(10)),
               ),

@@ -1,4 +1,4 @@
-import 'package:budget_master/components/verticalBar.dart';
+import 'package:budget_master/components/vertical_bar.dart';
 import 'package:budget_master/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,9 +20,9 @@ class _SideBarState extends State<SideBar> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: selectedOption == i ? AppColors.iconsFocus : null,
-        borderRadius: const BorderRadius.horizontal(right: Radius.circular(30)),
+        borderRadius: const BorderRadius.horizontal(left: Radius.circular(30)),
       ),
-      margin: const EdgeInsets.only(top: 10, right: 7),
+      margin: const EdgeInsets.only(top: 10, left: 7),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: IconButton(
         onPressed: () {
@@ -45,21 +45,27 @@ class _SideBarState extends State<SideBar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: const VerticalBar(),
+        border: const VerticalBar(2),
         color: AppColors.background,
       ),
       width: 75,
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Image.network(
-              "https://lirp.cdn-website.com/337cb0a3/dms3rep/multi/opt/app_icon%402x-1920w.png",
-              fit: BoxFit.contain,
-              width: 50,
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.green, width: 1.5),
+              borderRadius: BorderRadius.circular(28),
             ),
-          ), // TODO
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Image.network(
+                "https://avatars.githubusercontent.com/u/59930027?v=4",
+                fit: BoxFit.contain,
+                width: 50,
+              ),
+            ),
+          ),
           option(0, Icons.remove_red_eye),
           option(1, Icons.account_balance),
           option(2, Icons.monetization_on_outlined),

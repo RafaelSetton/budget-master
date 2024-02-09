@@ -1,5 +1,6 @@
+import 'package:budget_master/components/account_widget.dart';
 import 'package:budget_master/components/group_widget.dart';
-import 'package:budget_master/components/verticalBar.dart';
+import 'package:budget_master/components/vertical_bar.dart';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/pages/transactions.dart';
@@ -36,13 +37,24 @@ class _AccountsPageState extends State<AccountsPage> {
           ),
         )
         .toList();
+    List<AccountWidget> ungroupedAccounts = accounts.values
+        .where((element) => element.group == null)
+        .map((e) => AccountWidget(
+              data: e,
+              onSelect: () {
+                setState(() => selectedAccount = e.id);
+              },
+              selected: selectedAccount == e.id,
+            ))
+        .toList();
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.background,
         border: const VerticalBar(),
       ),
-      child: Column(children: groupWidgets),
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(children: [...ungroupedAccounts, ...groupWidgets]),
     );
   }
 

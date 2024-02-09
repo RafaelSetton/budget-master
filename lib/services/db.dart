@@ -81,6 +81,81 @@ class Database {
         'assetName': null,
         'type': 'expense',
       },
+      "tr2": {
+        'id': 'tr2',
+        'edited': 123,
+        'currency': 'brl',
+        'dateTime': 1000 * 60 * 60 * 24 * 365 * 54,
+        'totalValue': 112.5,
+        'accountPrimary': "acc4",
+        'description': "description",
+        'accountSecondary': "acc1",
+        'categories': {"cat1": 2, "cat2": 21.5},
+        'nShares': null,
+        'pricePerShare': null,
+        'assetName': null,
+        'type': 'income',
+      },
+      "tr3": {
+        'id': 'tr3',
+        'edited': 123,
+        'currency': 'brl',
+        'dateTime': 434444444,
+        'totalValue': 112.5,
+        'accountPrimary': "acc4",
+        'description': "description",
+        'accountSecondary': "acc1",
+        'categories': {"cat1": 2, "cat2": 21.5},
+        'nShares': null,
+        'pricePerShare': null,
+        'assetName': null,
+        'type': 'income',
+      },
+      "t6": {
+        'id': 't6',
+        'edited': 123,
+        'currency': 'brl',
+        'dateTime': 1000 * 60 * 60 * 24 * 365 * 54,
+        'totalValue': 112.5,
+        'accountPrimary': "acc4",
+        'description': "description",
+        'accountSecondary': "acc1",
+        'categories': {"cat1": 2, "cat2": 21.5},
+        'nShares': null,
+        'pricePerShare': null,
+        'assetName': null,
+        'type': 'income',
+      },
+      "t4": {
+        'id': 't4',
+        'edited': 123,
+        'currency': 'brl',
+        'dateTime': 1000 * 60 * 60 * 24 * 365 * 54,
+        'totalValue': 112.5,
+        'accountPrimary': "acc4",
+        'description': "description",
+        'accountSecondary': "acc1",
+        'categories': {"cat1": 2, "cat2": 21.5},
+        'nShares': null,
+        'pricePerShare': null,
+        'assetName': null,
+        'type': 'income',
+      },
+      "t5": {
+        'id': 't5',
+        'edited': 123,
+        'currency': 'brl',
+        'dateTime': 1000 * 60 * 60 * 24 * 365 * 54,
+        'totalValue': 112.5,
+        'accountPrimary': "acc4",
+        'description': "description",
+        'accountSecondary': "acc1",
+        'categories': {"cat1": 2, "cat2": 21.5},
+        'nShares': null,
+        'pricePerShare': null,
+        'assetName': null,
+        'type': 'income',
+      },
     };
     Map exampleAccounts = {
       "acc1": {
@@ -158,6 +233,24 @@ class Database {
         'color': 9
       }
     };
+
+    for (int i = 0; i < 30; i++) {
+      exampleTransactions["copy$i"] = {
+        'id': "copy$i",
+        'edited': 123,
+        'currency': 'brl',
+        'dateTime': 1000 * 60 * 60 * 24 * 365 * 12,
+        'totalValue': 11,
+        'accountPrimary': "acc1",
+        'description': "description",
+        'accountSecondary': "acc2",
+        'categories': {"cat1ad": 2, "dsaf2": 21.5},
+        'nShares': null,
+        'pricePerShare': null,
+        'assetName': null,
+        'type': 'income',
+      };
+    }
 
     await _prefs.setString("transactions", json.encode(exampleTransactions));
     await _prefs.setString("accounts", json.encode(exampleAccounts));
