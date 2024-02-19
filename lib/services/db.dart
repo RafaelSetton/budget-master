@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
+import 'package:budget_master/models/budget.dart';
 import 'package:budget_master/models/transaction.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,6 +12,7 @@ class Database {
   static late Map<String, Transaction> _transactions;
   static late Map<String, Account> _accounts;
   static late Map<String, AccountGroup> _groups;
+  static late Map<String, Budget> _budgets;
   static late SharedPreferences _prefs;
 
   static Future load() async {
@@ -30,6 +32,9 @@ class Database {
         json.decode(_prefs.getString("transactions")!) as Map<String, dynamic>;
     _transactions =
         data.map((key, value) => MapEntry(key, Transaction.fromMap(value)));
+
+    data = json.decode(_prefs.getString("budgets")!) as Map<String, dynamic>;
+    _budgets = data.map((key, value) => MapEntry(key, Budget.fromMap(value)));
   }
 
   static void setValue(String key, dynamic value) async {
@@ -39,6 +44,7 @@ class Database {
   static Map<String, Transaction> get transactions => _transactions;
   static Map<String, Account> get accounts => _accounts;
   static Map<String, AccountGroup> get groups => _groups;
+  static Map<String, Budget> get budgets => _budgets;
 
   /* static LocalStorage get database {
     _database ??= LocalStorage(
@@ -233,6 +239,28 @@ class Database {
         'color': 9
       }
     };
+    Map exampleBudgets = {
+      "ex1": Budget(
+        id: 'ex1',
+        value: 150,
+        begin: DateTime.now().subtract(const Duration(days: 11)),
+        duration: const Duration(days: 30),
+        rollover: false,
+        categories: ["cat1"],
+        accounts: ["acc1", "acc3"],
+        name: "LALA",
+      ).toMap(),
+      "ex2": Budget(
+        id: 'ex2',
+        value: 111,
+        begin: DateTime.now().subtract(const Duration(days: 3)),
+        duration: const Duration(days: 15),
+        rollover: false,
+        categories: ["cat2"],
+        accounts: ["acc1", "acc3"],
+        name: "asdas",
+      ).toMap(),
+    };
 
     for (int i = 0; i < 30; i++) {
       exampleTransactions["copy$i"] = {
@@ -255,5 +283,6 @@ class Database {
     await _prefs.setString("transactions", json.encode(exampleTransactions));
     await _prefs.setString("accounts", json.encode(exampleAccounts));
     await _prefs.setString("groups", json.encode(exampleGroups));
+    await _prefs.setString("budgets", json.encode(exampleBudgets));
   }
 }
