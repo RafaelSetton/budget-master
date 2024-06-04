@@ -1,25 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-class Interval {
+class TimeInterval {
   int years;
   int months;
   int weeks;
   int days;
-  Interval({
+  TimeInterval({
     this.years = 0,
     this.months = 0,
     this.weeks = 0,
     this.days = 0,
   });
 
-  Interval copyWith({
+  TimeInterval copyWith({
     int? years,
     int? months,
     int? weeks,
     int? days,
   }) {
-    return Interval(
+    return TimeInterval(
       years: years ?? this.years,
       months: months ?? this.months,
       weeks: weeks ?? this.weeks,
@@ -36,8 +36,8 @@ class Interval {
     };
   }
 
-  factory Interval.fromMap(Map<String, dynamic> map) {
-    return Interval(
+  factory TimeInterval.fromMap(Map<String, dynamic> map) {
+    return TimeInterval(
       years: map['years'] as int,
       months: map['months'] as int,
       weeks: map['weeks'] as int,
@@ -47,8 +47,8 @@ class Interval {
 
   String toJson() => json.encode(toMap());
 
-  factory Interval.fromJson(String source) =>
-      Interval.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory TimeInterval.fromJson(String source) =>
+      TimeInterval.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -56,7 +56,7 @@ class Interval {
   }
 
   @override
-  bool operator ==(covariant Interval other) {
+  bool operator ==(covariant TimeInterval other) {
     if (identical(this, other)) return true;
 
     return other.years == years &&
@@ -69,4 +69,12 @@ class Interval {
   int get hashCode {
     return years.hashCode ^ months.hashCode ^ weeks.hashCode ^ days.hashCode;
   }
+}
+
+DateTime addInterval(DateTime date, TimeInterval interval) {
+  return date.copyWith(
+    year: date.year + interval.years,
+    month: date.month + interval.months,
+    day: date.day + interval.days + 7 * interval.weeks,
+  );
 }

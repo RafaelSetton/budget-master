@@ -2,13 +2,12 @@
 import 'dart:convert';
 
 import 'package:budget_master/models/transaction.dart';
-import 'package:budget_master/utils/date.dart';
-import 'package:budget_master/utils/interval.dart';
+import 'package:budget_master/utils/time_interval.dart';
 
 class ScheduledTransaction {
   Transaction transaction;
-  Date nextDate;
-  Interval interval;
+  DateTime nextDate;
+  TimeInterval interval;
   bool autoCreate;
   ScheduledTransaction({
     required this.transaction,
@@ -19,8 +18,8 @@ class ScheduledTransaction {
 
   ScheduledTransaction copyWith({
     Transaction? transaction,
-    Date? nextDate,
-    Interval? interval,
+    DateTime? nextDate,
+    TimeInterval? interval,
     bool? autoCreate,
   }) {
     return ScheduledTransaction(
@@ -44,8 +43,8 @@ class ScheduledTransaction {
     return ScheduledTransaction(
       transaction:
           Transaction.fromMap(map['transaction'] as Map<String, dynamic>),
-      nextDate: Date.fromMillisecondsSinceEpoch(map['nextDate'] as int),
-      interval: Interval.fromMap(map['interval'] as Map<String, dynamic>),
+      nextDate: DateTime.fromMillisecondsSinceEpoch(map['nextDate'] as int),
+      interval: TimeInterval.fromMap(map['interval'] as Map<String, dynamic>),
       autoCreate: map['autoCreate'] as bool,
     );
   }

@@ -5,8 +5,7 @@ import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/budget.dart';
 import 'package:budget_master/models/scheduled_transaction.dart';
 import 'package:budget_master/models/transaction.dart';
-import 'package:budget_master/utils/date.dart';
-import 'package:budget_master/utils/interval.dart';
+import 'package:budget_master/utils/time_interval.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Database {
@@ -274,20 +273,20 @@ class Database {
       '1': ScheduledTransaction(
               transaction:
                   Transaction.fromMap(exampleTransactions.values.first),
-              nextDate: Date.now(),
-              interval: Interval(weeks: 1))
+              nextDate: DateTime.now(),
+              interval: TimeInterval(weeks: 1))
           .toMap(),
       '2': ScheduledTransaction(
               transaction:
                   Transaction.fromMap(exampleTransactions.values.elementAt(1)),
-              nextDate: Date.now(),
-              interval: Interval(weeks: 2))
+              nextDate: DateTime.now(),
+              interval: TimeInterval(weeks: 2))
           .toMap(),
       '3': ScheduledTransaction(
               transaction:
                   Transaction.fromMap(exampleTransactions.values.elementAt(2)),
-              nextDate: Date.now(),
-              interval: Interval(months: 1))
+              nextDate: DateTime.now(),
+              interval: TimeInterval(months: 1))
           .toMap(),
     };
 
