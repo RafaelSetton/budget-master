@@ -1,7 +1,7 @@
 import 'package:budget_master/components/budget_widget.dart';
-import 'package:budget_master/components/vertical_bar.dart';
+import 'package:budget_master/components/selection_bar.dart';
+import 'package:budget_master/pages/transactions.dart';
 import 'package:budget_master/services/db.dart';
-import 'package:budget_master/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class BudgetsPage extends StatefulWidget {
@@ -12,30 +12,28 @@ class BudgetsPage extends StatefulWidget {
 }
 
 class _BudgetsPageState extends State<BudgetsPage> {
-  String? selected;
+  String selected = Database.budgets.keys.first;
 
-  Widget selection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: const VerticalBar(),
-      ),
-      padding: const EdgeInsets.only(top: 10),
-      child: Column(
-        children: Database.budgets.values
-            .map(
-              (e) => BudgetWidget(
-                data: e,
-                selected: selected == e.id,
-                onSelect: () {
-                  setState(() {
-                    selected = e.id;
-                  });
-                },
-              ),
-            )
-            .toList(),
-      ),
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Widget get selectionBar {
+    return SelectionBar(
+      children: Database.budgets.values
+          .map(
+            (e) => BudgetWidget(
+              data: e,
+              selected: selected == e.id,
+              onSelect: () {
+                setState(() {
+                  selected = e.id;
+                });
+              },
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -45,7 +43,11 @@ class _BudgetsPageState extends State<BudgetsPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          selection(),
+          selectionBar,
+          TransactionsPage(
+            accounts: Database.budgets[selected]?.accounts,
+            categories: Database.budgets[selected]?.categories,
+          )
         ],
       ),
     );

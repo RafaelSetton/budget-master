@@ -220,7 +220,7 @@ class Transaction {
     return <String, dynamic>{
       'id': id,
       'edited': edited.millisecondsSinceEpoch,
-      'currency': currency.toString(),
+      'currency': currency.name,
       'dateTime': dateTime.millisecondsSinceEpoch,
       'totalValue': _totalValue,
       'accountPrimary': accountPrimary,
@@ -230,7 +230,7 @@ class Transaction {
       'nShares': nShares,
       'pricePerShare': _pricePerShare,
       'assetName': assetName,
-      'type': type,
+      'type': type.name,
     };
   }
 

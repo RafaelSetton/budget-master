@@ -1,19 +1,32 @@
+import 'package:budget_master/components/creation_form/field.dart';
+import 'package:budget_master/components/creation_form/index.dart';
+import 'package:budget_master/components/creation_form/selectors/single_selection_field.dart';
+import 'package:budget_master/components/creation_form/selectors/text_field.dart';
+import 'package:budget_master/components/tab_selector.dart';
 import 'package:budget_master/components/vertical_bar.dart';
 import 'package:budget_master/utils/app_colors.dart';
-import 'package:flutter/material.dart';
+import 'package:budget_master/utils/app_sizes.dart';
+import 'package:flutter/material.dart' hide TextField;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SideBar extends StatefulWidget {
   final Function(int)? onChange;
+  final int active;
 
-  const SideBar({super.key, this.onChange});
+  const SideBar({super.key, this.onChange, this.active = 0});
 
   @override
   State<SideBar> createState() => _SideBarState();
 }
 
 class _SideBarState extends State<SideBar> {
-  int selectedOption = 0;
+  late int selectedOption;
+
+  @override
+  void initState() {
+    selectedOption = widget.active;
+    super.initState();
+  }
 
   Widget option(int i, IconData icon) {
     return Container(
@@ -41,6 +54,86 @@ class _SideBarState extends State<SideBar> {
     );
   }
 
+  Widget get popupButton {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.horizontal(left: Radius.circular(30)),
+      ),
+      margin: const EdgeInsets.only(top: 10, left: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: IconButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext cxt) {
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                child: TabSelector(
+                  tabs: [
+                    TabOption(
+                      title: "Grupo",
+                      child: CreationForm(
+                        onSubmit: () {},
+                        fields: [
+                          CreationFormField(
+                            title: "Nome",
+                            selector: TextSelector(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TabOption(
+                      title: "Conta",
+                      child: CreationForm(
+                        onSubmit: () {},
+                        fields: [
+                          CreationFormField(
+                            title: "Nome",
+                            selector: TextSelector(),
+                          ),
+                          CreationFormField(
+                              title: "Grupo",
+                              selector: SingleSelector(
+                                options: const [
+                                  "Rafa",
+                                  "Rico",
+                                  "Bens",
+                                  "Investimentos"
+                                ],
+                              ))
+                        ],
+                      ),
+                    ),
+                    TabOption(
+                      title: "Orçamento",
+                      child: CreationForm(
+                        onSubmit: () {},
+                        fields: [
+                          CreationFormField(
+                            title: "Nome",
+                            selector: TextSelector(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+        hoverColor: AppColors.iconsFocus,
+        icon: Icon(
+          Icons.add,
+          color: AppColors.icons,
+          size: 30,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,7 +141,7 @@ class _SideBarState extends State<SideBar> {
         border: const VerticalBar(2),
         color: AppColors.background,
       ),
-      width: 75,
+      width: AppSizes.sideBarWidth,
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
@@ -74,7 +167,7 @@ class _SideBarState extends State<SideBar> {
           Expanded(child: Container()),
           option(5, FontAwesomeIcons.fileImport),
           option(6, FontAwesomeIcons.fileExport),
-          option(7, Icons.add),
+          popupButton,
         ],
       ),
     );

@@ -29,7 +29,8 @@ class _AccountWidgetState extends State<AccountWidget> {
             widget.selected ? AppColors.iconsFocus : Colors.transparent,
         hoverColor: AppColors.iconsFocus,
         onPressed: widget.onSelect,
-        onDoubleTap: () {
+        onSecondaryTap: () {
+          print("Edit Account");
           //TODO edit
         },
         child: Row(

@@ -1,3 +1,8 @@
+import 'dart:io';
+import 'package:budget_master/utils/app_sizes.dart';
+import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
+
 import 'package:budget_master/components/side_bar.dart';
 import 'package:budget_master/pages/accounts.dart';
 import 'package:budget_master/pages/add.dart';
@@ -9,9 +14,13 @@ import 'package:budget_master/pages/scheduled.dart';
 import 'package:budget_master/pages/splash.dart';
 import 'package:budget_master/pages/transactions.dart';
 import 'package:budget_master/utils/app_colors.dart';
-import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows) {
+    WindowManager.instance.setMinimumSize(const Size(1280, 720));
+  }
   runApp(const App());
 }
 
@@ -25,7 +34,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   bool dataLoaded = false;
 
-  int currentPage = 0;
+  int currentPage = 2;
   static List<Widget> pages = [
     const TransactionsPage(),
     const AccountsPage(),
@@ -43,19 +52,28 @@ class _AppState extends State<App> {
     });
   }
 
+  Widget wrapper(BuildContext context) {
+    AppSizes.update(context);
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SideBar(onChange: setPage, active: currentPage),
+            pages[currentPage],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return dataLoaded
-        ? MaterialApp(
-            home: Scaffold(
-              backgroundColor: AppColors.background,
-              body: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SideBar(onChange: setPage),
-                  pages[currentPage],
-                ],
-              ),
+        ? NotificationListener(
+            child: SizeChangedLayoutNotifier(
+              child: wrapper(context),
             ),
           )
         : Splash(onLoad: () {

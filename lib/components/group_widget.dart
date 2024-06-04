@@ -1,6 +1,7 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:budget_master/components/account_widget.dart';
+import 'package:budget_master/components/highlight_button.dart';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/services/db.dart';
@@ -37,7 +38,7 @@ class _GroupWidgetState extends State<GroupWidget> {
     });
   }
 
-  Widget colorBar() {
+  Widget get colorBar {
     return Container(
       decoration: BoxDecoration(
         color: data.color,
@@ -47,34 +48,34 @@ class _GroupWidgetState extends State<GroupWidget> {
     );
   }
 
-  Widget header() {
+  Widget get header {
     double totalBalance = 0;
     for (var a in accounts) {
       totalBalance += a.balance;
     }
-    return TextButton(
+    return HighlightButton(
       onPressed: toggle,
+      onSecondaryTap: () {
+        //TODO
+        print("Edit Group");
+      },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text.rich(
-            TextSpan(
-              text: data.name.length <= 10
-                  ? data.name
-                  : "${data.name.substring(0, 9)}...",
-              style: TextStyle(
-                overflow: TextOverflow.clip,
-                color: AppColors.groupTitle,
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
+          Text(
+            data.name.length <= 10
+                ? data.name
+                : "${data.name.substring(0, 9)}...",
+            style: TextStyle(
+              overflow: TextOverflow.clip,
+              color: AppColors.groupTitle,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
             ),
           ),
-          Text.rich(
-            TextSpan(
-              style: TextStyle(color: AppColors.groupSubtitle),
-              text: "R\$ $totalBalance",
-            ),
+          Text(
+            "R\$ $totalBalance",
+            style: TextStyle(color: AppColors.groupSubtitle),
           ),
         ],
       ),
@@ -83,7 +84,7 @@ class _GroupWidgetState extends State<GroupWidget> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> columnChildren = [header()];
+    List<Widget> columnChildren = [header];
     if (expand)
       columnChildren += accounts
           .map((acc) => AccountWidget(
@@ -99,7 +100,7 @@ class _GroupWidgetState extends State<GroupWidget> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            colorBar(),
+            colorBar,
             Container(
               padding: const EdgeInsets.all(10),
               width: accGroupWidth,

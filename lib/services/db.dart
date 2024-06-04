@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/budget.dart';
+import 'package:budget_master/models/scheduled_transaction.dart';
 import 'package:budget_master/models/transaction.dart';
+import 'package:budget_master/utils/date.dart';
+import 'package:budget_master/utils/interval.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Database {
@@ -13,6 +16,7 @@ class Database {
   static late Map<String, Account> _accounts;
   static late Map<String, AccountGroup> _groups;
   static late Map<String, Budget> _budgets;
+  static late Map<String, ScheduledTransaction> _scheduled;
   static late SharedPreferences _prefs;
 
   static Future load() async {
@@ -35,6 +39,10 @@ class Database {
 
     data = json.decode(_prefs.getString("budgets")!) as Map<String, dynamic>;
     _budgets = data.map((key, value) => MapEntry(key, Budget.fromMap(value)));
+
+    data = json.decode(_prefs.getString("scheduleds")!) as Map<String, dynamic>;
+    _scheduled = data.map(
+        (key, value) => MapEntry(key, ScheduledTransaction.fromMap(value)));
   }
 
   static void setValue(String key, dynamic value) async {
@@ -45,6 +53,7 @@ class Database {
   static Map<String, Account> get accounts => _accounts;
   static Map<String, AccountGroup> get groups => _groups;
   static Map<String, Budget> get budgets => _budgets;
+  static Map<String, ScheduledTransaction> get scheduled => _scheduled;
 
   /* static LocalStorage get database {
     _database ??= LocalStorage(
@@ -261,6 +270,26 @@ class Database {
         name: "asdas",
       ).toMap(),
     };
+    Map exampleScheduleds = {
+      '1': ScheduledTransaction(
+              transaction:
+                  Transaction.fromMap(exampleTransactions.values.first),
+              nextDate: Date.now(),
+              interval: Interval(weeks: 1))
+          .toMap(),
+      '2': ScheduledTransaction(
+              transaction:
+                  Transaction.fromMap(exampleTransactions.values.elementAt(1)),
+              nextDate: Date.now(),
+              interval: Interval(weeks: 2))
+          .toMap(),
+      '3': ScheduledTransaction(
+              transaction:
+                  Transaction.fromMap(exampleTransactions.values.elementAt(2)),
+              nextDate: Date.now(),
+              interval: Interval(months: 1))
+          .toMap(),
+    };
 
     for (int i = 0; i < 30; i++) {
       exampleTransactions["copy$i"] = {
@@ -284,5 +313,6 @@ class Database {
     await _prefs.setString("accounts", json.encode(exampleAccounts));
     await _prefs.setString("groups", json.encode(exampleGroups));
     await _prefs.setString("budgets", json.encode(exampleBudgets));
+    await _prefs.setString("scheduleds", json.encode(exampleScheduleds));
   }
 }

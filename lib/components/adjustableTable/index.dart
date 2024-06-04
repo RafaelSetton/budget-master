@@ -34,53 +34,61 @@ class _AdjustableTableState extends State<AdjustableTable> {
     super.initState();
   }
 
-  Widget get headerRow => SizedBox(
-        height: 30,
-        child: ReorderableListView(
-          buildDefaultDragHandles: false,
-          scrollDirection: Axis.horizontal,
-          onReorder: (oldIndex, newIndex) {
-            setState(() {
-              if (oldIndex < newIndex) newIndex -= 1;
+  Widget get headerRow {
+    return SizedBox(
+      height: 30,
+      child: ReorderableListView(
+        buildDefaultDragHandles: false,
+        scrollDirection: Axis.horizontal,
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            if (oldIndex < newIndex) newIndex -= 1;
 
-              final AdjustableHeaderCell item = headers.removeAt(oldIndex);
-              headers.insert(newIndex, item);
-              headers.asMap().forEach((key, value) {
-                value.index = key;
-              });
+            final AdjustableHeaderCell item = headers.removeAt(oldIndex);
+            headers.insert(newIndex, item);
+            headers.asMap().forEach((key, value) {
+              value.index = key;
             });
-          },
-          children: headers,
-        ),
-      );
+          });
+        },
+        children: headers,
+      ),
+    );
+  }
 
-  Row transactionRow(MapEntry e) {
+  Widget transactionRow(MapEntry e) {
     int index = e.key;
     Transaction transaction = e.value;
     Map<String, dynamic> attrs = transaction.display();
 
-    return Row(
-      children: headers
-          .map(
-            (e) => Container(
-              decoration: BoxDecoration(
-                  color: AppColors.tableBodyBackground[index % 2],
-                  border: Border.all()),
-              height: 30,
-              width: e.width,
-              child: Text(
-                attrs[e.text],
-                overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onSecondaryTap: () {
+        print("Edit Transaction");
+        //TODO
+      },
+      child: Row(
+        children: headers
+            .map(
+              (e) => Container(
+                decoration: BoxDecoration(
+                    color: AppColors.tableBodyBackground[index % 2],
+                    border: Border.all()),
+                height: 30,
+                width: e.width,
+                child: Text(
+                  attrs[e.text],
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          )
-          .toList(),
+            )
+            .toList(),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Row> rows =
+    List<Widget> rows =
         widget.transactions.asMap().entries.map(transactionRow).toList();
 
     return Column(
