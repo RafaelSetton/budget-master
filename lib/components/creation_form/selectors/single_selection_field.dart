@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class SingleSelector extends CreationFormSelector {
-  SingleSelector({super.key, required this.options}) {
-    options.insert(0, "Nenhum");
+  SingleSelector(
+      {super.key, bool optional = true, required List<String> options})
+      : options = optional ? ["Nenhum", ...options] : options {
+    _value = this.options[0];
   }
 
   final List<String> options;
-  String _value = "Nenhum";
+  late String _value;
 
   @override
   String get value => _value;
@@ -19,11 +21,17 @@ class SingleSelector extends CreationFormSelector {
 }
 
 class _SingleSelectorState extends State<SingleSelector> {
-  String value = "Nenhum";
+  late String value;
+
+  @override
+  void initState() {
+    value = widget.options[0];
+    super.initState();
+  }
 
   void onChange(String? value) {
     setState(() {
-      this.value = value ?? "Nenhum";
+      this.value = value ?? widget.options[0];
     });
     widget._value = this.value;
   }

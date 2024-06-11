@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'dart:core';
 
@@ -12,7 +13,7 @@ class Transaction {
   Currency currency;
   TransactionType type;
   DateTime dateTime;
-  num _totalValue;
+  double _totalValue;
   String accountPrimary;
   String description;
 
@@ -20,12 +21,12 @@ class Transaction {
   String? accountSecondary;
 
   // For Expenses/Incomes
-  Map<String, num>? categories;
+  Map<String, double>? categories;
   String? payee;
 
   // For Buy's/Sell's
-  num? nShares;
-  num? _pricePerShare;
+  double? nShares;
+  double? _pricePerShare;
   String? assetName;
 
   bool get isBuySell =>
@@ -34,18 +35,25 @@ class Transaction {
       type == TransactionType.expense || type == TransactionType.income;
   bool get isTransfer => type == TransactionType.transfer;
 
-  num get pricePerShare => isBuySell
+  double get pricePerShare => isBuySell
       ? _pricePerShare!
       : throw UnimplementedError("Transaction is not buy/sell");
-  num get totalValue => _totalValue;
+  double get totalValue {
+    if (isExpenseIncome) {
+      return categories!.values.sum;
+    } else if (isBuySell) {
+      return nShares! * _pricePerShare!;
+    }
+    return _totalValue;
+  }
 
-  set pricePerShare(num val) {
+  set pricePerShare(double val) {
     if (!isBuySell) throw UnimplementedError("Transaction is not buy/sell");
     _pricePerShare = val;
     _totalValue = _pricePerShare! * nShares!;
   }
 
-  set totalValue(num val) {
+  set totalValue(double val) {
     _totalValue = val;
     if (isBuySell) _pricePerShare = _totalValue / nShares!;
   }
@@ -68,7 +76,7 @@ class Transaction {
     required this.currency,
     required this.type,
     required this.dateTime,
-    required num totalValue,
+    required double totalValue,
     required this.accountPrimary,
     required this.description,
     this.categories,
@@ -76,7 +84,7 @@ class Transaction {
     this.nShares,
     this.assetName,
     this.payee,
-    num? pricePerShare,
+    double? pricePerShare,
   })  : _totalValue = totalValue,
         _pricePerShare = pricePerShare;
 
@@ -86,9 +94,9 @@ class Transaction {
     required Currency currency,
     required TransactionType type,
     required DateTime dateTime,
-    required num totalValue,
+    required double totalValue,
     required String accountPrimary,
-    required Map<String, num> categories,
+    required Map<String, double> categories,
     required String description,
     required String payee,
   }) {
@@ -113,8 +121,8 @@ class Transaction {
     required TransactionType type,
     required DateTime dateTime,
     required String accountPrimary,
-    required num nShares,
-    required num totalValue,
+    required double nShares,
+    required double totalValue,
     required String assetName,
     required String description,
   }) {
@@ -140,8 +148,8 @@ class Transaction {
     required TransactionType type,
     required DateTime dateTime,
     required String accountPrimary,
-    required num nShares,
-    required num pricePerShare,
+    required double nShares,
+    required double pricePerShare,
     required String assetName,
     required String description,
   }) {
@@ -167,7 +175,7 @@ class Transaction {
     required TransactionType type,
     required DateTime dateTime,
     required String accountPrimary,
-    required num totalValue,
+    required double totalValue,
     required String accountSecondary,
     required String description,
   }) {
@@ -189,13 +197,13 @@ class Transaction {
     DateTime? edited,
     Currency? currency,
     DateTime? dateTime,
-    num? totalValue,
+    double? totalValue,
     String? accountPrimary,
     String? description,
     String? accountSecondary,
-    Map<String, num>? categories,
-    num? nShares,
-    num? pricePerShare,
+    Map<String, double>? categories,
+    double? nShares,
+    double? pricePerShare,
     String? assetName,
     TransactionType? type,
   }) {
@@ -240,15 +248,16 @@ class Transaction {
       edited: DateTime.fromMillisecondsSinceEpoch(map['edited'] as int),
       currency: Currency.values.byName(map['currency']),
       dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
-      totalValue: map['totalValue'] as num,
+      totalValue: (map['totalValue'] as num).toDouble(),
       accountPrimary: map['accountPrimary'] as String,
       description: map['description'] as String,
       accountSecondary: map['accountSecondary'] as String?,
       categories: map['categories'] != null
-          ? Map<String, num>.from(map['categories'])
+          ? Map<String, double>.from((map['categories'])
+              .map((key, value) => MapEntry(key, value.toDouble())))
           : null,
-      nShares: map['nShares'] != null ? map['nShares'] as num : null,
-      pricePerShare: map['pricePerShare'] as num?,
+      nShares: (map['nShares'] as num?)?.toDouble(),
+      pricePerShare: (map['pricePerShare'] as num?)?.toDouble(),
       assetName: map['assetName'] != null ? map['assetName'] as String : null,
       type: TransactionType.values.byName(map['type']),
     );

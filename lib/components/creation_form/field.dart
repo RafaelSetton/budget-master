@@ -27,8 +27,10 @@ class _CreationFormFieldState extends State<CreationFormField> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
         children: [
           Text("${widget.title}:"),
+          const SizedBox(width: 15),
           widget.selector,
         ],
       ),

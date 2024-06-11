@@ -17,6 +17,8 @@ dependencies:
   path_provider: ^2.1.2
   shared_preferences: ^2.2.2
   window_manager: ^0.2.7
+  fl_chart: ^0.68.0
+  animated_custom_dropdown: ^3.1.0
 
 dev_dependencies:
   flutter_test:

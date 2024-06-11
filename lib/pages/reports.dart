@@ -1,3 +1,4 @@
+import 'package:budget_master/components/graphs/bar/index.dart';
 import 'package:budget_master/components/selection_bar.dart';
 import 'package:budget_master/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
@@ -68,16 +69,32 @@ class _ReportsPageState extends State<ReportsPage> {
       graphSelectionItem(
         icon: Icons.bar_chart,
         name: "Evolução das categorias no período",
-        page: Container(
-          color: Colors.red,
-          child: ElevatedButton(
-            child: const Text("<-"),
-            onPressed: () {
-              setState(() {
-                graph = null;
-              });
-            },
-          ),
+        page: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(25),
+              ),
+              margin: const EdgeInsets.all(5),
+              child: BackButton(
+                onPressed: () {
+                  setState(() {
+                    graph = null;
+                  });
+                },
+              ),
+            ),
+            SizedBox(
+              width: AppSizes.window.width - AppSizes.sideBarWidth - 10,
+              height: AppSizes.window.height - 70,
+              child: const BarGraph(),
+            ),
+          ],
         ),
       ),
       graphSelectionItem(
