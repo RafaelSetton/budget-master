@@ -1,14 +1,28 @@
 import 'package:localstorage/localstorage.dart';
 
 class Category {
-  static Map<String, Map?>? _all;
+  final String name;
+  final Category? parent;
+  final List<Category> children;
 
-  static Map<String, Map?> get all {
-    _all ??= LocalStorage("categories.json").getItem("all") ?? {};
-    return _all!;
+  String get fullName => parent != null ? "${parent?.fullName} > $name" : name;
+
+  Category({required this.name, this.parent, this.children = const []}) {
+    if (parent == null) _bases.add(this);
   }
 
-  static validate(String name) {
+  static final List<Category> _bases =
+      LocalStorage("categories.json").getItem("all") ?? [];
+
+  static Map<String, Map?> _getMap(Category c) {
+    return {for (Category sub in c.children) sub.name: _getMap(sub)};
+  }
+
+  static Map<String, Map?> get all {
+    return {for (Category sub in _bases) sub.name: _getMap(sub)};
+  }
+
+  static bool validate(String name) {
     Map<String, Map?>? curr = all;
     try {
       name.split(" > ").forEach((e) {
@@ -17,6 +31,6 @@ class Category {
     } on NoSuchMethodError catch (_) {
       return false;
     }
-    return curr == null;
+    return curr?.isEmpty ?? false;
   }
 }

@@ -3,7 +3,7 @@ import 'package:budget_master/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'package:budget_master/components/side_bar.dart';
+import 'package:budget_master/pages/side_bar.dart';
 import 'package:budget_master/pages/accounts.dart';
 import 'package:budget_master/pages/add.dart';
 import 'package:budget_master/pages/budgets.dart';
@@ -34,7 +34,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   bool dataLoaded = false;
 
-  int currentPage = 2;
+  int currentPage = 1;
   static List<Widget> pages = [
     const TransactionsPage(),
     const AccountsPage(),

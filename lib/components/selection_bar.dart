@@ -20,9 +20,10 @@ class _SelectionBarState extends State<SelectionBar> {
         color: AppColors.background,
         border: const VerticalBar(),
       ),
+      height: AppSizes.window.height,
       width: AppSizes.secondaryBarWidth,
       padding: const EdgeInsets.only(top: 10),
-      child: Column(children: widget.children),
+      child: SingleChildScrollView(child: Column(children: widget.children)),
     );
   }
 }

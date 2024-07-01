@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
-class DateSelector extends CreationFormSelector {
-  DateSelector({super.key});
+class DateSelector extends CreationFormSelector<DateTime> {
+  DateSelector({super.key, DateTime? initialDate})
+      : _date = initialDate ?? DateTime.now();
 
   @override
   State<DateSelector> createState() => _DateSelectorState();
 
-  DateTime _date = DateTime.now();
+  DateTime _date;
 
   @override
-  get value => _date;
+  DateTime get value => _date;
 }
 
 class _DateSelectorState extends State<DateSelector> {
@@ -28,7 +29,6 @@ class _DateSelectorState extends State<DateSelector> {
         );
         date.then((value) => setState(() {
               if (value != null) widget._date = value;
-              print(value);
             }));
       },
       child: Text(DateFormat("dd/MM/yyyy").format(widget._date)),

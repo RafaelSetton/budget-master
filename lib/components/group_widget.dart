@@ -4,33 +4,32 @@ import 'package:budget_master/components/account_widget.dart';
 import 'package:budget_master/components/highlight_button.dart';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
+import 'package:budget_master/pages/edit/group.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:budget_master/utils/app_colors.dart';
-import 'package:budget_master/utils/consts.dart';
+import 'package:budget_master/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
 
 class GroupWidget extends StatefulWidget {
-  final AccountGroup data;
+  final String id;
   final void Function(String) onSelect;
   final String selected;
 
-  const GroupWidget(this.data,
+  const GroupWidget(this.id,
       {super.key, required this.onSelect, required this.selected});
 
   @override
-  // ignore: no_logic_in_create_state
-  State<GroupWidget> createState() => _GroupWidgetState(data);
+  State<GroupWidget> createState() => _GroupWidgetState();
 }
 
 class _GroupWidgetState extends State<GroupWidget> {
-  AccountGroup data;
-  late List<Account> accounts;
-  Map<String, bool> hovers = {};
   bool expand = false;
 
-  _GroupWidgetState(this.data) {
-    accounts = Database.accountsByGroup(data.id) ?? [];
-  }
+  _GroupWidgetState();
+
+  List<Account> get accounts =>
+      Database.accounts.getAll((a) => a.group == widget.id);
+  AccountGroup get data => Database.groups.get(widget.id)!;
 
   void toggle() {
     setState(() {
@@ -56,8 +55,13 @@ class _GroupWidgetState extends State<GroupWidget> {
     return HighlightButton(
       onPressed: toggle,
       onSecondaryTap: () {
-        //TODO
-        print("Edit Group");
+        showDialog(
+          context: context,
+          builder: (ctx) => GroupEditDialog(
+            widget.id,
+            context: ctx,
+          ),
+        );
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,7 +78,7 @@ class _GroupWidgetState extends State<GroupWidget> {
             ),
           ),
           Text(
-            "R\$ $totalBalance",
+            "R\$ ${totalBalance.toStringAsFixed(2)}",
             style: TextStyle(color: AppColors.groupSubtitle),
           ),
         ],
@@ -103,7 +107,7 @@ class _GroupWidgetState extends State<GroupWidget> {
             colorBar,
             Container(
               padding: const EdgeInsets.all(10),
-              width: accGroupWidth,
+              width: AppSizes.accGroupWidth,
               decoration: BoxDecoration(
                 color: AppColors.groupBackground,
                 borderRadius:

@@ -1,7 +1,7 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:budget_master/utils/app_colors.dart';
-import 'package:budget_master/utils/consts.dart';
+import 'package:budget_master/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
 
 class ProgressBar extends StatelessWidget {
@@ -14,7 +14,7 @@ class ProgressBar extends StatelessWidget {
   double get yellowPoint => mark;
   double get redPoint => mark * 1.1;
 
-  double get width => accGroupWidth - 30;
+  double get width => AppSizes.accGroupWidth - 30;
 
   Color mixColors(Color color1, Color color2, double point) {
     return Color.fromARGB(

@@ -3,17 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 
 // ignore: must_be_immutable
-class MultipleSelector extends CreationFormSelector {
+class MultipleSelector extends CreationFormSelector<List<String>> {
   final List<String> options;
-  List<String> _selected;
+  late List<String> _selected;
+  late final Map<String, String> pairs;
 
-  MultipleSelector(this.options, {super.key}) : _selected = const [];
+  MultipleSelector(this.options,
+      {super.key,
+      List<String>? preSelected,
+      String Function(String)? display}) {
+    display ??= (e) => e;
+    _selected = preSelected?.map(display).toList() ?? [];
+    pairs = Map.fromEntries(options.map((e) => MapEntry(display!(e), e)));
+  }
 
   @override
   State<MultipleSelector> createState() => _MultipleSelectorState();
 
   @override
-  get value => _selected;
+  List<String> get value => _selected.map((e) => pairs[e]!).toList();
 }
 
 class _MultipleSelectorState extends State<MultipleSelector> {
@@ -21,7 +29,8 @@ class _MultipleSelectorState extends State<MultipleSelector> {
   Widget build(BuildContext context) {
     return Expanded(
       child: CustomDropdown.multiSelectSearch(
-        items: widget.options,
+        initialItems: widget._selected,
+        items: widget.pairs.keys.toList(),
         onListChanged: (val) => widget._selected = val,
       ),
     );

@@ -4,21 +4,13 @@ class AppSizes {
   static Size window = const Size(1280, 720);
   static const double sideBarWidth = 75;
   static const double secondaryBarWidth = 280;
-  static final Map<int, void Function()> _listeners = {};
-  static int counter = 0;
-  static int addListener(void Function() listener) {
-    _listeners[++counter] = listener;
-    return counter;
-  }
+  static const double accGroupWidth = 250;
 
-  static void removeListener(int id) {
-    _listeners.remove(id);
-  }
+  static final ChangeNotifier notifier = ChangeNotifier();
 
   static void update(BuildContext context) {
     window = MediaQuery.of(context).size;
-    for (var element in _listeners.values) {
-      element();
-    }
+    // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+    notifier.notifyListeners();
   }
 }

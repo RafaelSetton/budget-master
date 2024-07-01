@@ -1,8 +1,6 @@
 import 'package:budget_master/components/account_widget.dart';
 import 'package:budget_master/components/group_widget.dart';
 import 'package:budget_master/components/selection_bar.dart';
-import 'package:budget_master/models/account.dart';
-import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/pages/transactions.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:flutter/material.dart';
@@ -15,18 +13,25 @@ class AccountsPage extends StatefulWidget {
 }
 
 class _AccountsPageState extends State<AccountsPage> {
-  final Map<String, AccountGroup> groups;
-  final Map<String, Account> accounts;
-  String selectedAccount;
+  String selectedAccount = "";
 
-  _AccountsPageState()
-      : groups = Database.groups,
-        accounts = Database.accounts,
-        selectedAccount = "";
+  void reset() => setState(() {});
 
-  GroupWidget groupWidget(AccountGroup group) {
+  @override
+  void initState() {
+    Database.notifier.addListener(reset);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    Database.notifier.removeListener(reset);
+    super.dispose();
+  }
+
+  GroupWidget groupWidget(String groupID) {
     return GroupWidget(
-      group,
+      groupID,
       onSelect: (selectedId) {
         setState(() => selectedAccount = selectedId);
       },
@@ -45,9 +50,10 @@ class _AccountsPageState extends State<AccountsPage> {
   }
 
   Widget get accountSelection {
-    List<GroupWidget> groupWidgets = groups.values.map(groupWidget).toList();
-    List<AccountWidget> ungroupedAccounts = accounts.values
-        .where((element) => element.group == null)
+    List<GroupWidget> groupWidgets =
+        Database.groups.getIDs().map(groupWidget).toList();
+    List<AccountWidget> ungroupedAccounts = Database.accounts
+        .getAll((element) => element.group == null)
         .map(accountWidget)
         .toList();
 
@@ -61,7 +67,11 @@ class _AccountsPageState extends State<AccountsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           accountSelection,
-          TransactionsPage(accounts: [selectedAccount]),
+          TransactionsPage(
+            filter: (t) =>
+                t.accountIn == selectedAccount ||
+                t.accountOut == selectedAccount,
+          ),
         ],
       ),
     );

@@ -28,7 +28,7 @@ class _CreationFormState extends State<CreationForm> {
           style: ButtonStyle(
               backgroundColor: MaterialStatePropertyAll(AppColors.popUpButton)),
           onPressed: () => widget.onSubmit(
-              {for (var f in widget.fields) f.title: f.selector.value}),
+              {for (var f in widget.fields) f.identifier: f.selector.value}),
           child: Text(
             widget.submitText,
             style: TextStyle(color: AppColors.popUpButtonText),

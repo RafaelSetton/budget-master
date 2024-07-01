@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-abstract class CreationFormSelector extends StatefulWidget {
+abstract class CreationFormSelector<T> extends StatefulWidget {
   const CreationFormSelector({super.key});
 
-  dynamic get value;
+  T get value;
 }

@@ -27,7 +27,8 @@ class BarGraphRenderer extends StatelessWidget {
   final int nBars;
 
   const BarGraphRenderer(
-      {required this.categories,
+      {super.key,
+      required this.categories,
       required this.accounts,
       required this.beginDate,
       required this.endDate,

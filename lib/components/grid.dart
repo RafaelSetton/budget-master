@@ -24,7 +24,6 @@ class Grid extends StatefulWidget {
 
 class _GridState extends State<Grid> {
   double availableWidth = 0;
-  int _listenerId = -1;
 
   void _updateWidth() {
     setState(() {
@@ -39,13 +38,13 @@ class _GridState extends State<Grid> {
     availableWidth = AppSizes.window.width -
         AppSizes.sideBarWidth -
         widget.totalHorizontalPadding;
-    _listenerId = AppSizes.addListener(_updateWidth);
+    AppSizes.notifier.addListener(_updateWidth);
     super.initState();
   }
 
   @override
   void dispose() {
-    AppSizes.removeListener(_listenerId);
+    AppSizes.notifier.removeListener(_updateWidth);
     super.dispose();
   }
 

@@ -1,20 +1,26 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:budget_master/models/model.dart';
 import 'package:budget_master/models/transaction.dart';
-import 'package:budget_master/utils/time_interval.dart';
+import 'package:budget_master/models/time_interval.dart';
 
-class ScheduledTransaction {
+class ScheduledTransaction extends Model {
+  @override
+  String get id => "scheduled-${transaction.id}";
+
   Transaction transaction;
   DateTime nextDate;
   TimeInterval interval;
   bool autoCreate;
+
   ScheduledTransaction({
     required this.transaction,
     required this.nextDate,
     required this.interval,
     this.autoCreate = false,
-  });
+    DateTime? edited,
+  }) : super(edited: edited);
 
   ScheduledTransaction copyWith({
     Transaction? transaction,
@@ -30,6 +36,7 @@ class ScheduledTransaction {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'transaction': transaction.toMap(),
@@ -44,12 +51,10 @@ class ScheduledTransaction {
       transaction:
           Transaction.fromMap(map['transaction'] as Map<String, dynamic>),
       nextDate: DateTime.fromMillisecondsSinceEpoch(map['nextDate'] as int),
-      interval: TimeInterval.fromMap(map['interval'] as Map<String, dynamic>),
+      interval: TimeInterval.fromMap(map['interval']),
       autoCreate: map['autoCreate'] as bool,
     );
   }
-
-  String toJson() => json.encode(toMap());
 
   factory ScheduledTransaction.fromJson(String source) =>
       ScheduledTransaction.fromMap(json.decode(source) as Map<String, dynamic>);

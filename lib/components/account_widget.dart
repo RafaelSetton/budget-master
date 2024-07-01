@@ -1,7 +1,8 @@
 import 'package:budget_master/components/highlight_button.dart';
 import 'package:budget_master/models/account.dart';
+import 'package:budget_master/pages/edit/account.dart';
 import 'package:budget_master/utils/app_colors.dart';
-import 'package:budget_master/utils/consts.dart';
+import 'package:budget_master/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
 
 class AccountWidget extends StatefulWidget {
@@ -23,15 +24,17 @@ class _AccountWidgetState extends State<AccountWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: accGroupWidth,
+      width: AppSizes.accGroupWidth,
       child: HighlightButton(
         defaultColor:
             widget.selected ? AppColors.iconsFocus : Colors.transparent,
         hoverColor: AppColors.iconsFocus,
         onPressed: widget.onSelect,
         onSecondaryTap: () {
-          print("Edit Account");
-          //TODO edit
+          showDialog(
+            context: context,
+            builder: (ctx) => AccountEditDialog(widget.data.id, context: ctx),
+          );
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

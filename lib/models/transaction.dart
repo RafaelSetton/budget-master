@@ -1,24 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:budget_master/models/model.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'dart:core';
 
 import 'package:budget_master/models/enums.dart';
 
-class Transaction {
-  // Required
-  String id;
-  DateTime edited;
+class Transaction extends Model {
+  @override
+  String get id => _id;
+
+  // Basics
+  String _id;
   Currency currency;
   TransactionType type;
   DateTime dateTime;
   double _totalValue;
-  String accountPrimary;
   String description;
-
-  // For Transfers
-  String? accountSecondary;
+  String? accountIn;
+  String? accountOut;
 
   // For Expenses/Incomes
   Map<String, double>? categories;
@@ -59,8 +60,9 @@ class Transaction {
   }
 
   Map<String, dynamic> display() {
+    //TODO (Transaction)
     return {
-      "Conta": accountPrimary,
+      "Conta": accountIn,
       "Valor": totalValue.toString(),
       "Data": DateFormat('dd/MM/yyyy').format(dateTime),
       "Descrição": description,
@@ -71,31 +73,32 @@ class Transaction {
   }
 
   Transaction._main({
-    required this.id,
-    required this.edited,
+    String? id,
+    DateTime? edited,
     required this.currency,
     required this.type,
     required this.dateTime,
     required double totalValue,
-    required this.accountPrimary,
     required this.description,
+    this.accountIn,
     this.categories,
-    this.accountSecondary,
+    this.accountOut,
     this.nShares,
     this.assetName,
     this.payee,
     double? pricePerShare,
   })  : _totalValue = totalValue,
-        _pricePerShare = pricePerShare;
+        _pricePerShare = pricePerShare,
+        _id = id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        super(edited: edited);
 
   factory Transaction.expenseIncome({
-    required String id,
-    required DateTime edited,
+    String? id,
+    DateTime? edited,
     required Currency currency,
     required TransactionType type,
     required DateTime dateTime,
-    required double totalValue,
-    required String accountPrimary,
+    required String accountIn,
     required Map<String, double> categories,
     required String description,
     required String payee,
@@ -107,8 +110,8 @@ class Transaction {
       currency: currency,
       type: type,
       dateTime: dateTime,
-      totalValue: totalValue,
-      accountPrimary: accountPrimary,
+      totalValue: categories.values.sum,
+      accountIn: accountIn,
       categories: categories,
       payee: payee,
     );
@@ -120,7 +123,7 @@ class Transaction {
     required Currency currency,
     required TransactionType type,
     required DateTime dateTime,
-    required String accountPrimary,
+    required String accountIn,
     required double nShares,
     required double totalValue,
     required String assetName,
@@ -134,7 +137,7 @@ class Transaction {
       type: type,
       dateTime: dateTime,
       totalValue: totalValue,
-      accountPrimary: accountPrimary,
+      accountIn: accountIn,
       nShares: nShares,
       pricePerShare: totalValue / nShares,
       assetName: assetName,
@@ -147,7 +150,7 @@ class Transaction {
     required Currency currency,
     required TransactionType type,
     required DateTime dateTime,
-    required String accountPrimary,
+    required String accountIn,
     required double nShares,
     required double pricePerShare,
     required String assetName,
@@ -161,7 +164,7 @@ class Transaction {
       type: type,
       dateTime: dateTime,
       totalValue: pricePerShare * nShares,
-      accountPrimary: accountPrimary,
+      accountIn: accountIn,
       nShares: nShares,
       pricePerShare: pricePerShare,
       assetName: assetName,
@@ -169,14 +172,13 @@ class Transaction {
   }
 
   factory Transaction.transfer({
-    required String id,
-    required DateTime edited,
+    String? id,
+    DateTime? edited,
     required Currency currency,
-    required TransactionType type,
     required DateTime dateTime,
-    required String accountPrimary,
+    required String accountIn,
     required double totalValue,
-    required String accountSecondary,
+    required String accountOut,
     required String description,
   }) {
     return Transaction._main(
@@ -184,11 +186,11 @@ class Transaction {
       description: description,
       edited: edited,
       currency: currency,
-      type: type,
+      type: TransactionType.transfer,
       dateTime: dateTime,
       totalValue: totalValue,
-      accountPrimary: accountPrimary,
-      accountSecondary: accountPrimary,
+      accountIn: accountIn,
+      accountOut: accountOut,
     );
   }
 
@@ -198,9 +200,9 @@ class Transaction {
     Currency? currency,
     DateTime? dateTime,
     double? totalValue,
-    String? accountPrimary,
+    String? accountIn,
     String? description,
-    String? accountSecondary,
+    String? accountOut,
     Map<String, double>? categories,
     double? nShares,
     double? pricePerShare,
@@ -213,9 +215,9 @@ class Transaction {
       currency: currency ?? this.currency,
       dateTime: dateTime ?? this.dateTime,
       totalValue: totalValue ?? _totalValue,
-      accountPrimary: accountPrimary ?? this.accountPrimary,
+      accountIn: accountIn ?? this.accountIn,
       description: description ?? this.description,
-      accountSecondary: accountSecondary ?? this.accountSecondary,
+      accountOut: accountOut ?? this.accountOut,
       categories: categories ?? this.categories,
       nShares: nShares ?? this.nShares,
       pricePerShare: pricePerShare ?? _pricePerShare,
@@ -224,6 +226,7 @@ class Transaction {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
@@ -231,9 +234,9 @@ class Transaction {
       'currency': currency.name,
       'dateTime': dateTime.millisecondsSinceEpoch,
       'totalValue': _totalValue,
-      'accountPrimary': accountPrimary,
+      'accountIn': accountIn,
       'description': description,
-      'accountSecondary': accountSecondary,
+      'accountOut': accountOut,
       'categories': categories,
       'nShares': nShares,
       'pricePerShare': _pricePerShare,
@@ -249,9 +252,9 @@ class Transaction {
       currency: Currency.values.byName(map['currency']),
       dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
       totalValue: (map['totalValue'] as num).toDouble(),
-      accountPrimary: map['accountPrimary'] as String,
+      accountIn: map['accountIn'] as String,
       description: map['description'] as String,
-      accountSecondary: map['accountSecondary'] as String?,
+      accountOut: map['accountOut'] as String?,
       categories: map['categories'] != null
           ? Map<String, double>.from((map['categories'])
               .map((key, value) => MapEntry(key, value.toDouble())))
@@ -262,8 +265,6 @@ class Transaction {
       type: TransactionType.values.byName(map['type']),
     );
   }
-
-  String toJson() => json.encode(toMap());
 
   factory Transaction.fromJson(String source) =>
       Transaction.fromMap(json.decode(source) as Map<String, dynamic>);
@@ -278,10 +279,10 @@ class Transaction {
         currency: $currency, 
         dateTime: $dateTime, 
         totalValue: $_totalValue, 
-        accountPrimary: $accountPrimary, 
+        accountIn: $accountIn, 
         description: $description, 
       Transfers:
-        accountSecondary: $accountSecondary, 
+        accountOut: $accountOut, 
       InOut:
         categories: $categories, 
       BuySell:
@@ -301,9 +302,9 @@ class Transaction {
         other.currency == currency &&
         other.dateTime == dateTime &&
         other._totalValue == _totalValue &&
-        other.accountPrimary == accountPrimary &&
+        other.accountIn == accountIn &&
         other.description == description &&
-        other.accountSecondary == accountSecondary &&
+        other.accountOut == accountOut &&
         other.categories == categories &&
         other.nShares == nShares &&
         other._pricePerShare == _pricePerShare &&
@@ -317,9 +318,9 @@ class Transaction {
         currency.hashCode ^
         dateTime.hashCode ^
         _totalValue.hashCode ^
-        accountPrimary.hashCode ^
+        accountIn.hashCode ^
         description.hashCode ^
-        accountSecondary.hashCode ^
+        accountOut.hashCode ^
         categories.hashCode ^
         nShares.hashCode ^
         _pricePerShare.hashCode ^

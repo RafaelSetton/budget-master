@@ -2,6 +2,7 @@
 
 import 'package:budget_master/components/adjustableTable/header.dart';
 import 'package:budget_master/models/transaction.dart';
+import 'package:budget_master/pages/edit/transaction.dart';
 import 'package:budget_master/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -63,8 +64,10 @@ class _AdjustableTableState extends State<AdjustableTable> {
 
     return GestureDetector(
       onSecondaryTap: () {
-        print("Edit Transaction");
-        //TODO
+        showDialog(
+          context: context,
+          builder: (ctx) => TransactionEditDialog(transaction.id, context: ctx),
+        );
       },
       child: Row(
         children: headers

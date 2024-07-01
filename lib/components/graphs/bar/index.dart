@@ -40,7 +40,7 @@ class _BarGraphState extends State<BarGraph> {
         ),
       );
     });
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(Durations.long2, () {
       setState(() {
         graph = BarGraphRenderer(
             categories: categories,

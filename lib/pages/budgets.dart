@@ -12,7 +12,7 @@ class BudgetsPage extends StatefulWidget {
 }
 
 class _BudgetsPageState extends State<BudgetsPage> {
-  String selected = Database.budgets.keys.first;
+  String selected = Database.budgets.getIDs().first;
 
   @override
   void initState() {
@@ -21,14 +21,15 @@ class _BudgetsPageState extends State<BudgetsPage> {
 
   Widget get selectionBar {
     return SelectionBar(
-      children: Database.budgets.values
+      children: Database.budgets
+          .getIDs()
           .map(
             (e) => BudgetWidget(
-              data: e,
-              selected: selected == e.id,
+              id: e,
+              selected: selected == e,
               onSelect: () {
                 setState(() {
-                  selected = e.id;
+                  selected = e;
                 });
               },
             ),
@@ -45,8 +46,7 @@ class _BudgetsPageState extends State<BudgetsPage> {
         children: [
           selectionBar,
           TransactionsPage(
-            accounts: Database.budgets[selected]?.accounts,
-            categories: Database.budgets[selected]?.categories,
+            filter: Database.budgets.get(selected)?.filter ?? (t) => false,
           )
         ],
       ),

@@ -6,6 +6,15 @@ class TimeInterval {
   int months;
   int weeks;
   int days;
+
+  DateTime addToInterval(DateTime date) {
+    return date.copyWith(
+      year: date.year + years,
+      month: date.month + months,
+      day: date.day + days + 7 * weeks,
+    );
+  }
+
   TimeInterval({
     this.years = 0,
     this.months = 0,
@@ -44,9 +53,6 @@ class TimeInterval {
       days: map['days'] as int,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
   factory TimeInterval.fromJson(String source) =>
       TimeInterval.fromMap(json.decode(source) as Map<String, dynamic>);
 
@@ -69,12 +75,4 @@ class TimeInterval {
   int get hashCode {
     return years.hashCode ^ months.hashCode ^ weeks.hashCode ^ days.hashCode;
   }
-}
-
-DateTime addInterval(DateTime date, TimeInterval interval) {
-  return date.copyWith(
-    year: date.year + interval.years,
-    month: date.month + interval.months,
-    day: date.day + interval.days + 7 * interval.weeks,
-  );
 }

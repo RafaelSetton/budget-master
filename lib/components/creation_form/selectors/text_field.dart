@@ -1,12 +1,16 @@
 import 'package:budget_master/components/creation_form/selectors/selector.dart';
 import 'package:budget_master/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // ignore: must_be_immutable
 class TextSelector extends CreationFormSelector {
-  TextSelector({super.key});
+  TextSelector(
+      {super.key, String? initialValue, this.inputFormatters = const []})
+      : _value = initialValue ?? "";
 
-  String _value = "";
+  final List<TextInputFormatter> inputFormatters;
+  String _value;
 
   @override
   String get value => _value;
@@ -16,12 +20,13 @@ class TextSelector extends CreationFormSelector {
 }
 
 class _TextSelectorState extends State<TextSelector> {
-  final TextEditingController _controller = TextEditingController();
+  late final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
+    _controller.text = widget._value;
     _controller.addListener(() {
       widget._value = _controller.text;
     });
@@ -44,6 +49,7 @@ class _TextSelectorState extends State<TextSelector> {
       width: 150,
       height: 35,
       child: TextField(
+        inputFormatters: widget.inputFormatters,
         cursorColor: AppColors.cursor,
         scrollController: _scrollController,
         focusNode: _focusNode,

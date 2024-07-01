@@ -1,0 +1,32 @@
+import 'package:budget_master/models/enums.dart';
+import 'package:budget_master/pages/edit/base.dart';
+import 'package:budget_master/services/db.dart';
+import 'package:budget_master/utils/consts.dart';
+import 'package:flutter/material.dart';
+
+class BudgetEditDialog extends EditDialog {
+  BudgetEditDialog(String id, {super.key, required BuildContext context})
+      : super(
+          fields: budgetFormFields(Database.budgets.get(id)),
+          onSubmit: (d) {
+            Database.budgets.edit(
+              id,
+              (p1) => p1.copyWith(
+                name: d['name'],
+                value: d['value'],
+                accounts: d['accounts'],
+                begin: d['begin'],
+                categories: d['categories'],
+                period: TimePeriod.values.byName(d['period']),
+                rollover: d['rollover'],
+              ),
+            );
+            Future.delayed(Durations.long2, Navigator.of(context).pop);
+          },
+          onDelete: () {
+            Database.budgets.delete(id);
+            Future.delayed(Durations.long2, Navigator.of(context).pop);
+          },
+          title: "Editar Orçamento",
+        );
+}

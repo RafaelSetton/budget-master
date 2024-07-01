@@ -3,9 +3,14 @@ import 'selectors/selector.dart';
 
 class CreationFormField extends StatefulWidget {
   const CreationFormField(
-      {super.key, required this.title, required this.selector});
+      {super.key,
+      required this.title,
+      required this.selector,
+      String? identifier})
+      : identifier = identifier ?? title;
 
   final String title;
+  final String identifier;
   final CreationFormSelector selector;
 
   dynamic get value => selector.value;

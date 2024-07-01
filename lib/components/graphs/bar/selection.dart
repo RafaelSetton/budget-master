@@ -49,19 +49,14 @@ class BarGraphFieldSelector extends StatelessWidget {
     _endDate = data["Data Final"];
     _categories = data["Categorias"];
     _accounts = data["Contas"];
-    _interval = {
-      "Ano": TimePeriod.year,
-      "Mês": TimePeriod.month,
-      "Semana": TimePeriod.week,
-      "Dia": TimePeriod.day
-    }[data["Intervalo"]]!;
+    _interval = TimePeriod.values.byName(data["Intervalo"]);
 
     assert(
         _endDate.isAfter(_beginDate), "Data final deve ser depois da inicial");
     assert(nBars <= 54, "Acima do limite de 54 intervalos");
 
     _data = {for (var cat in _categories) cat: {}};
-    for (Transaction t in Database.transactions.values) {
+    for (Transaction t in Database.transactions.getAll()) {
       if (!t.isExpenseIncome ||
           t.dateTime.isAfter(_endDate) ||
           t.dateTime.isBefore(_beginDate)) continue;
@@ -96,17 +91,16 @@ class BarGraphFieldSelector extends StatelessWidget {
         ),
         CreationFormField(
           title: "Contas",
-          selector: MultipleSelector(Database.accounts.keys.toList()),
+          selector: MultipleSelector(Database.accounts.getIDs()),
         ),
         CreationFormField(title: "Data Inicial", selector: DateSelector()),
         CreationFormField(title: "Data Final", selector: DateSelector()),
         CreationFormField(
-          title: "Intervalo",
-          selector: SingleSelector(
-            optional: false,
-            options: const ["Ano", "Mês", "Semana", "Dia"],
-          ),
-        ),
+            title: "Intervalo",
+            selector: SingleSelector(
+              optional: false,
+              options: TimePeriod.values.asNameMap().keys.toList(),
+            )),
       ],
     );
   }

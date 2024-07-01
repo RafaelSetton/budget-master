@@ -26,7 +26,10 @@ class _ScheduledPageState extends State<ScheduledPage> {
 
   Widget itemBuilder(ScheduledTransaction st) {
     return GestureDetector(
-      onDoubleTap: () {}, //TODO
+      onSecondaryTap: () {
+        debugPrint("Edit Scheduled");
+        //TODO (Scheduled)
+      },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey.shade500,
@@ -42,7 +45,7 @@ class _ScheduledPageState extends State<ScheduledPage> {
           children: [
             propertyRow(
               Icons.account_balance_outlined,
-              st.transaction.accountPrimary,
+              st.transaction.accountIn ?? "",
             ),
             propertyRow(
               Icons.format_align_left_rounded,
@@ -75,7 +78,10 @@ class _ScheduledPageState extends State<ScheduledPage> {
       width: 50,
       height: 50,
       child: ElevatedButton(
-        onPressed: () {}, // TODO
+        onPressed: () {
+          debugPrint("Create Scheduled");
+          // TODO (Scheduled)
+        },
         style: ElevatedButton.styleFrom(padding: EdgeInsets.zero),
         child: const Icon(Icons.add, color: Colors.black),
       ),
@@ -89,7 +95,7 @@ class _ScheduledPageState extends State<ScheduledPage> {
         itemHeight: itemHeight,
         itemWidth: itemWidth + itemMargin * 2,
         totalHorizontalPadding: 30,
-        children: Database.scheduled.values.map(itemBuilder).toList(),
+        children: Database.scheduled.getAll().map(itemBuilder).toList(),
       ),
     );
   }

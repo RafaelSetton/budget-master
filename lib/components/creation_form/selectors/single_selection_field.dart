@@ -5,9 +5,15 @@ import 'package:flutter/material.dart';
 // ignore: must_be_immutable
 class SingleSelector extends CreationFormSelector {
   SingleSelector(
-      {super.key, bool optional = true, required List<String> options})
+      {super.key,
+      bool optional = true,
+      required List<String> options,
+      int? selectedIndex,
+      String? selectedOption})
       : options = optional ? ["Nenhum", ...options] : options {
-    _value = this.options[0];
+    int index = selectedIndex ??
+        (selectedOption != null ? this.options.indexOf(selectedOption) : 0);
+    _value = this.options[index];
   }
 
   final List<String> options;
@@ -25,7 +31,7 @@ class _SingleSelectorState extends State<SingleSelector> {
 
   @override
   void initState() {
-    value = widget.options[0];
+    value = widget._value;
     super.initState();
   }
 

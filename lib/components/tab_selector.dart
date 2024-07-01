@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:budget_master/utils/app_colors.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class TabOption {
@@ -35,45 +36,50 @@ class _TabSelectorState extends State<TabSelector> {
 
   BorderSide get tabDivider => const BorderSide();
 
-  Widget get header => Row(
-        children: widget.tabs.indexed
-            .map(
-              (e) => GestureDetector(
-                onTap: () => setState(() {
-                  selected = e.$1;
-                }),
-                child: Container(
-                  width: tabWidth,
-                  height: headerHeight,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      left: e.$1 > 0
-                          ? tabDivider
-                          : BorderSide.none, // Sem borda no começo
-                      right: e.$1 < widget.tabs.length - 1
-                          ? tabDivider
-                          : BorderSide.none, // Sem borda no fim
-                      bottom: selected == e.$1
-                          ? BorderSide.none
-                          : const BorderSide(),
-                    ),
-                    color: selected == e.$1
-                        ? AppColors.popUpSelectedBackground
-                        : AppColors.popUpBackground,
+  Widget get header {
+    return Row(
+      children: widget.tabs
+          .mapIndexed(
+            (idx, tab) => GestureDetector(
+              onTap: () => setState(() {
+                selected = idx;
+              }),
+              child: Container(
+                width: tabWidth,
+                height: headerHeight,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: idx > 0
+                        ? tabDivider
+                        : BorderSide.none, // Sem borda no começo
+                    right: idx < widget.tabs.length - 1
+                        ? tabDivider
+                        : BorderSide.none, // Sem borda no fim
+                    bottom:
+                        selected == idx ? BorderSide.none : const BorderSide(),
                   ),
-                  child: Text(e.$2.title),
+                  color: selected == idx
+                      ? AppColors.popUpSelectedBackground
+                      : AppColors.popUpBackground,
                 ),
+                child: Text(tab.title),
               ),
-            )
-            .toList(),
-      );
-  Widget get body => Container(
-        width: width,
-        height: bodyHeight,
-        color: AppColors.popUpSelectedBackground,
-        child: widget.tabs[selected].child,
-      );
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Widget get body {
+    return Container(
+      width: width,
+      height: bodyHeight,
+      color: AppColors.popUpSelectedBackground,
+      padding: const EdgeInsets.all(10),
+      child: SingleChildScrollView(child: widget.tabs[selected].child),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
