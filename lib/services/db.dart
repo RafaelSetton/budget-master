@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/budget.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/model.dart';
 import 'package:budget_master/models/scheduled_transaction.dart';
 import 'package:budget_master/models/transaction.dart';
@@ -18,6 +19,8 @@ abstract class Database {
   static late final AccountGroupsHandler groups;
   static late final ScheduledsHandler scheduled;
   static late final BudgetsHandler budgets;
+  static late final CategoriesHandler categories;
+
   static final ChangeNotifier notifier = ChangeNotifier();
   static final FileManager _fileManager = FileManager();
 
@@ -39,6 +42,8 @@ abstract class Database {
     budgets = BudgetsHandler(await _get("budgets", Budget.fromMap));
     scheduled = ScheduledsHandler(
         await _get("scheduled", ScheduledTransaction.fromMap));
+    categories = CategoriesHandler(
+        await _get("categories", TransactionCategory.fromMap));
 
     _fileManager.start();
 
@@ -51,6 +56,7 @@ abstract class Database {
     budgets.log = true;
     transactions.log = true;
     scheduled.log = true;
+    transactions.log = true;
 
     debugPrint(repr);
   }
@@ -62,6 +68,7 @@ abstract class Database {
       "transactions": transactions.getCount(),
       "budgets": budgets.getCount(),
       "scheduled": scheduled.getCount(),
+      "categories": categories.getCount(),
     }.toString();
   }
 }

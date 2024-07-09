@@ -4,7 +4,9 @@ import 'package:budget_master/models/budget.dart';
 import 'package:budget_master/models/model.dart';
 import 'package:budget_master/models/scheduled_transaction.dart';
 import 'package:budget_master/models/transaction.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/services/db.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class Handler<Element extends Model> {
@@ -33,7 +35,7 @@ abstract class Handler<Element extends Model> {
       filter == null ? _db.values.toList() : _db.values.where(filter).toList();
 
   @nonVirtual
-  Element? get(String id) {
+  Element? get(String? id) {
     return _db[id];
   }
 
@@ -46,7 +48,9 @@ abstract class Handler<Element extends Model> {
     return true;
   }
 
-  Element? edit(String id, Element Function(Element) f, [bool recurse = true]) {
+  Element? edit(String? id, Element Function(Element) f,
+      [bool recurse = true]) {
+    if (id == null) return null;
     if (log) debugPrint("Editing $Element with id=$id");
     if (!_db.containsKey(id)) return null;
     Element newE = f(_db[id]!);
@@ -90,7 +94,7 @@ class TransactionsHandler extends Handler<Transaction> {
   }
 
   @override
-  Transaction? edit(String id, Transaction Function(Transaction p1) f,
+  Transaction? edit(String? id, Transaction Function(Transaction p1) f,
       [bool recurse = true]) {
     Transaction? oldT = get(id);
     if (oldT == null) return null;
@@ -124,10 +128,10 @@ class AccountsHandler extends Handler<Account> {
   }
 
   @override
-  Account? edit(String id, Account Function(Account p1) f,
+  Account? edit(String? id, Account Function(Account p1) f,
       [bool recurse = true]) {
     Account? oldA = get(id);
-    if (oldA == null) return null;
+    if (oldA == null || id == null) return null;
     Account newA = super.edit(id, f, recurse)!;
 
     if (recurse && oldA.group != newA.group) {
@@ -168,7 +172,7 @@ class AccountGroupsHandler extends Handler<AccountGroup> {
   }
 
   @override
-  AccountGroup? edit(String id, AccountGroup Function(AccountGroup p1) f,
+  AccountGroup? edit(String? id, AccountGroup Function(AccountGroup p1) f,
       [bool recurse = true]) {
     AccountGroup? oldG = get(id);
     if (oldG == null) return null;
@@ -206,4 +210,78 @@ class BudgetsHandler extends Handler<Budget> {
 
 class ScheduledsHandler extends Handler<ScheduledTransaction> {
   ScheduledsHandler(super.db);
+}
+
+class CategoriesHandler extends Handler<TransactionCategory> {
+  CategoriesHandler(super.db);
+
+  @override
+  bool post(TransactionCategory element) {
+    assert(element.children.isEmpty);
+    if (!super.post(element)) return false;
+
+    edit(element.parent, (g) => g.copyWith(addChildren: [element.id]), false);
+
+    return true;
+  }
+
+  @override
+  TransactionCategory? edit(
+      String? id, TransactionCategory Function(TransactionCategory p1) f,
+      [bool recurse = true]) {
+    TransactionCategory? oldTC = get(id);
+    if (oldTC == null) return null;
+    TransactionCategory newTC = super.edit(id, f, recurse)!;
+
+    if (recurse && oldTC.children != newTC.children) {
+      for (String tc in oldTC.children.whereNot(newTC.children.contains)) {
+        edit(tc, (p1) => p1.copyWith(parent: ""), false);
+      }
+      for (String tc in newTC.children.whereNot(oldTC.children.contains)) {
+        edit(tc, (p1) => p1.copyWith(parent: newTC.id), false);
+      }
+    }
+    if (recurse && oldTC.parent != newTC.parent) {
+      edit(
+          oldTC.parent, (p1) => p1.copyWith(removeChildren: [oldTC.id]), false);
+      edit(newTC.parent, (p1) => p1.copyWith(addChildren: [newTC.id]), false);
+    }
+    return newTC;
+  }
+
+  @override
+  TransactionCategory? delete(String id) {
+    TransactionCategory? res = super.delete(id);
+    if (res == null) return null;
+
+    edit(res.parent, (p1) => p1.copyWith(removeChildren: [res.id]), false);
+    for (String tc in res.children) {
+      edit(tc, (p1) => p1.copyWith(parent: ""), false);
+    }
+
+    return res;
+  }
+
+  bool validate(String name) {
+    Map<String, Map?>? curr = map;
+    try {
+      name.split(" > ").forEach((e) {
+        curr = curr![e] as Map<String, Map?>?;
+      });
+    } on NoSuchMethodError catch (_) {
+      return false;
+    }
+    return curr?.isEmpty ?? false;
+  }
+
+  List<TransactionCategory> get bases =>
+      _db.values.where((element) => element.parent.isEmpty).toList();
+
+  Map<String, Map?> _getMap(TransactionCategory c) {
+    return {for (String sub in c.children) sub: _getMap(_db[sub]!)};
+  }
+
+  Map<String, Map?> get map {
+    return {for (TransactionCategory sub in bases) sub.name: _getMap(sub)};
+  }
 }

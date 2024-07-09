@@ -2,7 +2,7 @@ import 'package:budget_master/components/vertical_bar.dart';
 import 'package:budget_master/pages/creation.dart';
 import 'package:budget_master/utils/app_colors.dart';
 import 'package:budget_master/utils/app_sizes.dart';
-import 'package:flutter/material.dart' hide TextField;
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SideBar extends StatefulWidget {
@@ -114,6 +114,7 @@ class _SideBarState extends State<SideBar> {
           Expanded(child: Container()),
           option(5, FontAwesomeIcons.fileImport),
           option(6, FontAwesomeIcons.fileExport),
+          option(7, FontAwesomeIcons.gear),
           popUpButton,
         ],
       ),

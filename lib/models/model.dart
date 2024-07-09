@@ -6,6 +6,7 @@ abstract class Model {
   Model({DateTime? edited}) : edited = edited ?? DateTime.now();
 
   String get id;
+  String name = "";
   final DateTime edited;
 
   @protected

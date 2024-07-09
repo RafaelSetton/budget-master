@@ -19,6 +19,7 @@ dependencies:
   window_manager: ^0.2.7
   fl_chart: ^0.68.0
   animated_custom_dropdown: ^3.1.0
+  pair: ^0.1.2
 
 dev_dependencies:
   flutter_test:

@@ -5,6 +5,7 @@ class HighlightButton extends StatefulWidget {
   final Color defaultColor;
   final void Function()? onSecondaryTap;
   final void Function()? onDoubleTap;
+  final void Function(bool)? onHover;
   final void Function() onPressed;
   final Widget child;
 
@@ -15,7 +16,8 @@ class HighlightButton extends StatefulWidget {
       this.onSecondaryTap,
       this.onDoubleTap,
       required this.onPressed,
-      required this.child});
+      required this.child,
+      this.onHover});
 
   @override
   State<HighlightButton> createState() => _HighlightButtonState();
@@ -39,6 +41,9 @@ class _HighlightButtonState extends State<HighlightButton> {
             setState(() {
               hover = b;
             });
+            if (widget.onHover != null) {
+              widget.onHover!(b);
+            }
           },
           onPressed: widget.onPressed,
           child: widget.child,

@@ -7,3 +7,5 @@ enum Currency { brl, usd, eur }
 enum Sorting { category, date, value, description }
 
 enum TimePeriod { day, week, month, year }
+
+enum CheckState { checked, partial, blank }

@@ -1,36 +1,82 @@
-import 'package:localstorage/localstorage.dart';
+import 'package:budget_master/models/model.dart';
+import 'package:budget_master/services/db.dart';
+import 'package:collection/collection.dart';
 
-class Category {
+class TransactionCategory extends Model {
+  final String _id;
   final String name;
-  final Category? parent;
-  final List<Category> children;
+  final String parent;
+  final List<String> children;
+  late final String fullName;
 
-  String get fullName => parent != null ? "${parent?.fullName} > $name" : name;
+  @override
+  String get id => _id;
 
-  Category({required this.name, this.parent, this.children = const []}) {
-    if (parent == null) _bases.add(this);
+  TransactionCategory(
+      {required this.name,
+      String? parent,
+      this.children = const [],
+      String? fullName,
+      String? id,
+      DateTime? edited})
+      : _id = id ?? name,
+        parent = parent ?? "",
+        super(edited: edited) {
+    this.fullName = fullName ??
+        (this.parent.isEmpty
+            ? name
+            : "${Database.categories.get(parent)!.fullName} > $name");
   }
 
-  static final List<Category> _bases =
-      LocalStorage("categories.json").getItem("all") ?? [];
-
-  static Map<String, Map?> _getMap(Category c) {
-    return {for (Category sub in c.children) sub.name: _getMap(sub)};
+  TransactionCategory copyWith({
+    String? id,
+    String? name,
+    String? parent,
+    String? fullName,
+    List<String>? children,
+    List<String> addChildren = const [],
+    List<String> removeChildren = const [],
+    DateTime? edited,
+  }) {
+    children ??= (this.children..addAll(addChildren))
+        .whereNot(removeChildren.contains)
+        .toList();
+    return TransactionCategory(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      parent: parent ?? this.parent,
+      fullName: fullName,
+      children: children,
+      edited: edited,
+    );
   }
 
-  static Map<String, Map?> get all {
-    return {for (Category sub in _bases) sub.name: _getMap(sub)};
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "name": name,
+      "parent": parent,
+      "fullName": fullName,
+      "children": children,
+      "edited": edited.millisecondsSinceEpoch,
+    };
   }
 
-  static bool validate(String name) {
-    Map<String, Map?>? curr = all;
-    try {
-      name.split(" > ").forEach((e) {
-        curr = curr![e] as Map<String, Map?>?;
-      });
-    } on NoSuchMethodError catch (_) {
-      return false;
-    }
-    return curr?.isEmpty ?? false;
+  factory TransactionCategory.fromMap(Map<String, dynamic> map) {
+    return TransactionCategory(
+      id: map['id'],
+      name: map['name'],
+      parent: map['parent'],
+      fullName: map['fullName'],
+      children: List<String>.from(map['children']),
+      edited: DateTime.fromMillisecondsSinceEpoch(
+          map['edited'] ?? 1641031200000 + 1000000 * 36 * 24 * 73),
+    );
+  }
+
+  @override
+  String toString() {
+    return "Category($fullName, id: $id, name: $name, parent: $parent, children: ${children.length}, edited: $edited)";
   }
 }

@@ -43,7 +43,7 @@ class TransactionEditDialog extends EditDialog {
         accountIn = data['account'];
       }
       currency = Currency.values.byName(data['currency']);
-      categories = {data['category']: data['value']};
+      categories = {data['category'][0]: data['value']};
       totalValue = categories.values.sum;
     } else if (t.isTransfer) {
       accountIn = data['accountIn'];

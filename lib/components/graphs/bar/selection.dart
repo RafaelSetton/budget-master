@@ -1,7 +1,8 @@
 import 'package:budget_master/components/creation_form/field.dart';
 import 'package:budget_master/components/creation_form/index.dart';
+import 'package:budget_master/components/creation_form/selectors/account/multi_selector.dart';
+import 'package:budget_master/components/creation_form/selectors/category/multi_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/date_field.dart';
-import 'package:budget_master/components/creation_form/selectors/multiple_selection_field.dart';
 import 'package:budget_master/components/creation_form/selectors/single_selection_field.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/transaction.dart';
@@ -83,15 +84,11 @@ class BarGraphFieldSelector extends StatelessWidget {
       fields: [
         CreationFormField(
           title: "Categorias",
-          selector: MultipleSelector(const [
-            "cat1",
-            "cat2",
-            "c3",
-          ]),
+          selector: CategoryMultiSelector(),
         ),
         CreationFormField(
           title: "Contas",
-          selector: MultipleSelector(Database.accounts.getIDs()),
+          selector: AccountMultiSelector(),
         ),
         CreationFormField(title: "Data Inicial", selector: DateSelector()),
         CreationFormField(title: "Data Final", selector: DateSelector()),

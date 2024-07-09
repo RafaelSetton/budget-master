@@ -87,7 +87,7 @@ class Budget extends Model {
       'period': period.name,
       'categories': categories,
       'accounts': accounts,
-      'edited': edited,
+      'edited': edited.millisecondsSinceEpoch,
     };
   }
 

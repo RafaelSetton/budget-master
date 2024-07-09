@@ -1,5 +1,7 @@
 import 'package:budget_master/components/creation_form/field.dart';
+import 'package:budget_master/components/creation_form/selectors/account/single_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/bool_field.dart';
+import 'package:budget_master/components/creation_form/selectors/category/single_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/color_field.dart';
 import 'package:budget_master/components/creation_form/selectors/date_field.dart';
 import 'package:budget_master/components/creation_form/selectors/multiple_selection_field.dart';
@@ -92,10 +94,7 @@ List<CreationFormField> budgetFormFields([Budget? budget]) => [
       CreationFormField(
         title: "Categorias",
         identifier: "categories",
-        selector: MultipleSelector(
-          const ["cat1", "cat2", "c3"],
-          preSelected: budget?.categories,
-        ),
+        selector: CategorySingleSelector(),
       ),
       CreationFormField(
         title: "Intervalo",
@@ -140,8 +139,8 @@ List<CreationFormField> expenseIncomeFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Conta",
         identifier: "account",
-        selector: TextSelector(
-            initialValue: transaction?.accountIn ?? transaction?.accountOut),
+        selector: AccountSingleSelector(
+            /* selected: transaction?.accountIn ?? transaction?.accountOut */),
       ),
       CreationFormField(
         title: "Moeda",
@@ -154,10 +153,7 @@ List<CreationFormField> expenseIncomeFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Categoria",
         identifier: "category",
-        selector: SingleSelector(
-          options: const ["cat1", "cat2", "c3"],
-          selectedOption: transaction?.categories?.keys.first,
-        ),
+        selector: CategorySingleSelector(),
       ),
       CreationFormField(
         title: "Valor",
@@ -221,14 +217,6 @@ List<CreationFormField> buySellFormFields([Transaction? transaction]) => [
         selector: SingleSelector(
           optional: false,
           options: Currency.values.asNameMap().keys.toList(),
-        ),
-      ),
-      CreationFormField(
-        title: "Categoria",
-        identifier: "category",
-        selector: SingleSelector(
-          options: const ["cat1", "cat2", "c3"],
-          selectedOption: transaction?.categories?.keys.first,
         ),
       ),
       CreationFormField(

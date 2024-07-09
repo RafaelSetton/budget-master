@@ -36,6 +36,11 @@ class FileManager {
       json.encode(Database.scheduled.asMap
           .map((key, value) => MapEntry(key, value.toMap()))),
     );
+    await _write(
+      "categories",
+      json.encode(Database.categories.asMap
+          .map((key, value) => MapEntry(key, value.toMap()))),
+    );
   }
 
   Future start() async {
