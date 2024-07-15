@@ -120,9 +120,9 @@ class AccountsHandler extends Handler<Account> {
   bool post(Account element) {
     if (!super.post(element)) return false;
 
-    if (element.group != null) {
+    if (element.group.isNotEmpty) {
       Database.groups.edit(
-          element.group!, (g) => g.copyWith(addAccounts: [element.id]), false);
+          element.group, (g) => g.copyWith(addAccounts: [element.id]), false);
     }
     return true;
   }
@@ -135,13 +135,13 @@ class AccountsHandler extends Handler<Account> {
     Account newA = super.edit(id, f, recurse)!;
 
     if (recurse && oldA.group != newA.group) {
-      if (oldA.group != null) {
+      if (oldA.group.isNotEmpty) {
         Database.groups
-            .edit(oldA.group!, (g) => g.copyWith(removeAccounts: [id]), false);
+            .edit(oldA.group, (g) => g.copyWith(removeAccounts: [id]), false);
       }
-      if (newA.group != null) {
+      if (newA.group.isNotEmpty) {
         Database.groups
-            .edit(newA.group!, (g) => g.copyWith(addAccounts: [id]), false);
+            .edit(newA.group, (g) => g.copyWith(addAccounts: [id]), false);
       }
     }
     return newA;
@@ -150,9 +150,8 @@ class AccountsHandler extends Handler<Account> {
   @override
   Account? delete(String id) {
     Account? res = super.delete(id);
-    if (res?.group != null) {
-      Database.groups
-          .edit(res!.group!, (g) => g.copyWith(removeAccounts: [id]));
+    if (res?.group.isNotEmpty ?? false) {
+      Database.groups.edit(res!.group, (g) => g.copyWith(removeAccounts: [id]));
     }
     return res;
   }

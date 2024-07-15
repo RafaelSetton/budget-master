@@ -1,26 +1,24 @@
 import 'package:budget_master/components/creation_form/selectors/selector.dart';
 import 'package:budget_master/components/drop_down_button.dart';
-import 'package:budget_master/models/account.dart';
-import 'package:budget_master/services/db.dart';
+import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/utils/functions.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class AccountSingleSelector extends CreationFormSelector<Account> {
-  AccountSingleSelector({super.key, Account? selected}) {
-    _selected = selected ?? Database.accounts.getAll().first;
-  }
+class AccountTypeSelector extends CreationFormSelector<AccountType> {
+  AccountTypeSelector({super.key, AccountType? selected})
+      : _selected = selected ?? AccountType.checking;
+
+  late AccountType _selected;
 
   @override
-  State<AccountSingleSelector> createState() => _AccountSingleSelectorState();
-
-  late Account _selected;
+  AccountType get value => _selected;
 
   @override
-  Account get value => _selected;
+  State<StatefulWidget> createState() => _AccountTypeSelectorState();
 }
 
-class _AccountSingleSelectorState extends State<AccountSingleSelector> {
+class _AccountTypeSelectorState extends State<AccountTypeSelector> {
   static const double width = 150;
   static const double height = 35;
 
@@ -31,7 +29,7 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
       height: height,
       onDrop: (ctx) => showPositionedDialog(
         context: ctx,
-        builder: (ctx, offset) => _SelectorDialog(
+        builder: (_, offset) => _SelectorDialog(
           offset: offset,
           selected: widget._selected,
           onChange: (acc) => setState(() {
@@ -40,7 +38,7 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.name,
+      displayText: widget._selected.display,
     );
   }
 }
@@ -50,15 +48,15 @@ class _SelectorDialog extends StatefulWidget {
       {required this.offset, required this.onChange, required this.selected});
 
   final Offset offset;
-  final void Function(Account) onChange;
-  final Account selected;
+  final void Function(AccountType) onChange;
+  final AccountType selected;
 
   @override
   State<_SelectorDialog> createState() => __SelectorDialogState();
 }
 
 class __SelectorDialogState extends State<_SelectorDialog> {
-  late Account selected;
+  late AccountType selected;
 
   @override
   void initState() {
@@ -66,17 +64,17 @@ class __SelectorDialogState extends State<_SelectorDialog> {
     super.initState();
   }
 
-  Widget dropDownItem(Account acc) {
+  Widget dropDownItem(AccountType type) {
     const double selectorSize = 15;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          widget.onChange(acc);
           setState(() {
-            selected = acc;
+            selected = type;
           });
+          widget.onChange(type);
         },
         child: Container(
           width: 150,
@@ -100,13 +98,13 @@ class __SelectorDialogState extends State<_SelectorDialog> {
                   widthFactor: 0.85,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: selected == acc ? Colors.blue.shade800 : null,
+                      color: selected == type ? Colors.blue.shade800 : null,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
               ),
-              Text(acc.name),
+              Text(type.display),
             ],
           ),
         ),
@@ -123,7 +121,7 @@ class __SelectorDialogState extends State<_SelectorDialog> {
           top: widget.offset.dy,
           child: SingleChildScrollView(
             child: Column(
-              children: Database.accounts.getAll().map(dropDownItem).toList(),
+              children: AccountType.values.map(dropDownItem).toList(),
             ),
           ),
         )

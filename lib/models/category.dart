@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 
 class TransactionCategory extends Model {
   final String _id;
-  final String name;
   final String parent;
   final List<String> children;
   late final String fullName;
@@ -12,16 +11,15 @@ class TransactionCategory extends Model {
   @override
   String get id => _id;
 
-  TransactionCategory(
-      {required this.name,
-      String? parent,
-      this.children = const [],
-      String? fullName,
-      String? id,
-      DateTime? edited})
-      : _id = id ?? name,
-        parent = parent ?? "",
-        super(edited: edited) {
+  TransactionCategory({
+    required super.name,
+    String? parent,
+    this.children = const [],
+    String? fullName,
+    String? id,
+    super.edited,
+  })  : _id = id ?? name,
+        parent = parent ?? "" {
     this.fullName = fullName ??
         (this.parent.isEmpty
             ? name
@@ -38,7 +36,7 @@ class TransactionCategory extends Model {
     List<String> removeChildren = const [],
     DateTime? edited,
   }) {
-    children ??= (this.children..addAll(addChildren))
+    children ??= (this.children + addChildren)
         .whereNot(removeChildren.contains)
         .toList();
     return TransactionCategory(

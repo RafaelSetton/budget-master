@@ -1,26 +1,29 @@
 import 'package:budget_master/components/creation_form/selectors/selector.dart';
 import 'package:budget_master/components/drop_down_button.dart';
-import 'package:budget_master/models/account.dart';
-import 'package:budget_master/services/db.dart';
+import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/utils/functions.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class AccountSingleSelector extends CreationFormSelector<Account> {
-  AccountSingleSelector({super.key, Account? selected}) {
-    _selected = selected ?? Database.accounts.getAll().first;
+class TransactionTypeSelector extends CreationFormSelector<TransactionType> {
+  TransactionTypeSelector(
+      {super.key, List<TransactionType>? options, TransactionType? selected})
+      : options = options ?? TransactionType.values {
+    assert(this.options.isNotEmpty);
+    _selected = selected ?? this.options.first;
   }
 
-  @override
-  State<AccountSingleSelector> createState() => _AccountSingleSelectorState();
-
-  late Account _selected;
+  late TransactionType _selected;
+  final List<TransactionType> options;
 
   @override
-  Account get value => _selected;
+  TransactionType get value => _selected;
+
+  @override
+  State<StatefulWidget> createState() => _TransactionTypeSelectorState();
 }
 
-class _AccountSingleSelectorState extends State<AccountSingleSelector> {
+class _TransactionTypeSelectorState extends State<TransactionTypeSelector> {
   static const double width = 150;
   static const double height = 35;
 
@@ -31,7 +34,7 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
       height: height,
       onDrop: (ctx) => showPositionedDialog(
         context: ctx,
-        builder: (ctx, offset) => _SelectorDialog(
+        builder: (_, offset) => _SelectorDialog(
           offset: offset,
           selected: widget._selected,
           onChange: (acc) => setState(() {
@@ -40,7 +43,7 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.name,
+      displayText: widget._selected.display,
     );
   }
 }
@@ -50,15 +53,15 @@ class _SelectorDialog extends StatefulWidget {
       {required this.offset, required this.onChange, required this.selected});
 
   final Offset offset;
-  final void Function(Account) onChange;
-  final Account selected;
+  final void Function(TransactionType) onChange;
+  final TransactionType selected;
 
   @override
   State<_SelectorDialog> createState() => __SelectorDialogState();
 }
 
 class __SelectorDialogState extends State<_SelectorDialog> {
-  late Account selected;
+  late TransactionType selected;
 
   @override
   void initState() {
@@ -66,17 +69,17 @@ class __SelectorDialogState extends State<_SelectorDialog> {
     super.initState();
   }
 
-  Widget dropDownItem(Account acc) {
+  Widget dropDownItem(TransactionType type) {
     const double selectorSize = 15;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          widget.onChange(acc);
           setState(() {
-            selected = acc;
+            selected = type;
           });
+          widget.onChange(type);
         },
         child: Container(
           width: 150,
@@ -100,13 +103,13 @@ class __SelectorDialogState extends State<_SelectorDialog> {
                   widthFactor: 0.85,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: selected == acc ? Colors.blue.shade800 : null,
+                      color: selected == type ? Colors.blue.shade800 : null,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
               ),
-              Text(acc.name),
+              Text(type.display),
             ],
           ),
         ),
@@ -123,7 +126,7 @@ class __SelectorDialogState extends State<_SelectorDialog> {
           top: widget.offset.dy,
           child: SingleChildScrollView(
             child: Column(
-              children: Database.accounts.getAll().map(dropDownItem).toList(),
+              children: TransactionType.values.map(dropDownItem).toList(),
             ),
           ),
         )

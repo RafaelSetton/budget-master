@@ -1,4 +1,5 @@
-import 'package:budget_master/models/enums.dart';
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/pages/edit/base.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:budget_master/utils/consts.dart';
@@ -14,10 +15,13 @@ class BudgetEditDialog extends EditDialog {
               (p1) => p1.copyWith(
                 name: d['name'],
                 value: d['value'],
-                accounts: d['accounts'],
+                accounts:
+                    (d['accounts'] as List<Account>).map((e) => e.id).toList(),
                 begin: d['begin'],
-                categories: d['categories'],
-                period: TimePeriod.values.byName(d['period']),
+                categories: (d['categories'] as List<TransactionCategory>)
+                    .map((e) => e.id)
+                    .toList(),
+                period: d['period'],
                 rollover: d['rollover'],
               ),
             );

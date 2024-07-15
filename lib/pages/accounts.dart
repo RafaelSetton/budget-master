@@ -53,7 +53,7 @@ class _AccountsPageState extends State<AccountsPage> {
     List<GroupWidget> groupWidgets =
         Database.groups.getIDs().map(groupWidget).toList();
     List<AccountWidget> ungroupedAccounts = Database.accounts
-        .getAll((element) => element.group == null)
+        .getAll((element) => element.group.isEmpty)
         .map(accountWidget)
         .toList();
 

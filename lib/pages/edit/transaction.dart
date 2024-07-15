@@ -1,4 +1,6 @@
 import 'package:budget_master/components/creation_form/field.dart';
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/transaction.dart';
 import 'package:budget_master/pages/edit/base.dart';
@@ -21,9 +23,8 @@ class TransactionEditDialog extends EditDialog {
 
   static Transaction edit(Transaction t, Map<String, dynamic> data) {
     DateTime edited = DateTime.now();
-    TransactionType type = t.isTransfer
-        ? TransactionType.transfer
-        : TransactionType.values.byName(data['type']);
+    TransactionType type =
+        t.isTransfer ? TransactionType.transfer : data['type'];
     DateTime dateTime = data['dateTime'];
     String description = data['description'];
 
@@ -38,17 +39,19 @@ class TransactionEditDialog extends EditDialog {
 
     if (t.isExpenseIncome) {
       if (t.type == TransactionType.expense) {
-        accountOut = data['account'];
+        accountOut = (data['account'] as Account).id;
       } else {
-        accountIn = data['account'];
+        accountIn = (data['account'] as Account).id;
       }
-      currency = Currency.values.byName(data['currency']);
-      categories = {data['category'][0]: data['value']};
+      currency = data['currency'];
+      categories = {
+        (data['category'] as TransactionCategory).id: data['value']
+      };
       totalValue = categories.values.sum;
     } else if (t.isTransfer) {
-      accountIn = data['accountIn'];
-      accountOut = data['accountOut'];
-      currency = Currency.values.byName(data['currency']);
+      accountIn = (data['accountIn'] as Account).id;
+      accountOut = (data['accountOut'] as Account).id;
+      currency = data['currency'];
       totalValue = data['value'];
     } else {
       // TODO (BuySell)

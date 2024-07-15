@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 abstract class Model {
-  Model({DateTime? edited}) : edited = edited ?? DateTime.now();
+  Model({DateTime? edited, required this.name})
+      : edited = edited ?? DateTime.now();
 
   String get id;
-  String name = "";
+  String name;
   final DateTime edited;
 
   @protected

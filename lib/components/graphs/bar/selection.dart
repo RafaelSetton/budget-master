@@ -3,7 +3,9 @@ import 'package:budget_master/components/creation_form/index.dart';
 import 'package:budget_master/components/creation_form/selectors/account/multi_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/category/multi_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/date_field.dart';
-import 'package:budget_master/components/creation_form/selectors/single_selection_field.dart';
+import 'package:budget_master/components/creation_form/selectors/time_period_selector.dart';
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/transaction.dart';
 import 'package:budget_master/services/db.dart';
@@ -11,8 +13,8 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class BarGraphFieldSelector extends StatelessWidget {
-  final Function(List<String>, List<String>, DateTime, DateTime, TimePeriod,
-      Map<String, Map<int, double>>, int) onUpdate;
+  final Function(List<TransactionCategory>, List<Account>, DateTime, DateTime,
+      TimePeriod, Map<String, Map<int, double>>, int) onUpdate;
   BarGraphFieldSelector({super.key, required this.onUpdate})
       : _categories = [],
         _accounts = [],
@@ -20,8 +22,8 @@ class BarGraphFieldSelector extends StatelessWidget {
         _endDate = DateTime.now().add(const Duration(days: 1)),
         _interval = TimePeriod.year;
 
-  List<String> _categories;
-  List<String> _accounts;
+  List<TransactionCategory> _categories;
+  List<Account> _accounts;
   DateTime _beginDate;
   DateTime _endDate;
   TimePeriod _interval;
@@ -50,19 +52,19 @@ class BarGraphFieldSelector extends StatelessWidget {
     _endDate = data["Data Final"];
     _categories = data["Categorias"];
     _accounts = data["Contas"];
-    _interval = TimePeriod.values.byName(data["Intervalo"]);
+    _interval = data["Intervalo"];
 
     assert(
         _endDate.isAfter(_beginDate), "Data final deve ser depois da inicial");
     assert(nBars <= 54, "Acima do limite de 54 intervalos");
 
-    _data = {for (var cat in _categories) cat: {}};
+    _data = {for (var cat in _categories) cat.id: {}};
     for (Transaction t in Database.transactions.getAll()) {
       if (!t.isExpenseIncome ||
           t.dateTime.isAfter(_endDate) ||
           t.dateTime.isBefore(_beginDate)) continue;
       for (String cat in t.categories!.keys) {
-        if (!_categories.contains(cat)) continue;
+        if (!_categories.map((c) => c.id).contains(cat)) continue;
         double val = t.categories![cat]!;
         int key = getKey(t.dateTime);
         if (_data[cat]!.containsKey(key)) {
@@ -93,11 +95,9 @@ class BarGraphFieldSelector extends StatelessWidget {
         CreationFormField(title: "Data Inicial", selector: DateSelector()),
         CreationFormField(title: "Data Final", selector: DateSelector()),
         CreationFormField(
-            title: "Intervalo",
-            selector: SingleSelector(
-              optional: false,
-              options: TimePeriod.values.asNameMap().keys.toList(),
-            )),
+          title: "Intervalo",
+          selector: TimePeriodSelector(),
+        ),
       ],
     );
   }

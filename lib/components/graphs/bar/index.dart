@@ -1,6 +1,8 @@
 import 'package:budget_master/components/graphs/bar/graph.dart';
 import 'package:budget_master/components/graphs/bar/selection.dart';
 import 'package:budget_master/components/resizable.dart';
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:flutter/material.dart';
 
@@ -24,8 +26,8 @@ class _BarGraphState extends State<BarGraph> {
   }
 
   void setGraph(
-      List<String> categories,
-      List<String> accounts,
+      List<TransactionCategory> categories,
+      List<Account> accounts,
       DateTime beginDate,
       DateTime endDate,
       TimePeriod interval,

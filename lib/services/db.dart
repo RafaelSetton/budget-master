@@ -28,8 +28,10 @@ abstract class Database {
       String fileName, T Function(Map<String, dynamic>) fromMap) async {
     final String content = await _fileManager.read(fileName) ?? "{}";
 
-    return (json.decode(content) as Map<String, dynamic>)
-        .map((key, value) => MapEntry(key, fromMap(value)));
+    return Map.fromEntries((json.decode(content) as List<dynamic>).map((value) {
+      T obj = fromMap(value);
+      return MapEntry(obj.id, obj);
+    }));
   }
 
   static Future load() async {

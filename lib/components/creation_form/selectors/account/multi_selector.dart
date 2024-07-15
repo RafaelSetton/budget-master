@@ -1,10 +1,11 @@
 import 'package:budget_master/components/creation_form/selectors/selector.dart';
-import 'package:budget_master/components/highlight_button.dart';
+import 'package:budget_master/components/drop_down_button.dart';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/model.dart';
 import 'package:budget_master/services/db.dart';
+import 'package:budget_master/utils/functions.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -26,58 +27,23 @@ class _AccountMultiSelectorState extends State<AccountMultiSelector> {
   static const double width = 150;
   static const double height = 35;
 
-  bool expanded = false;
-  IconData get icon => expanded ? Icons.arrow_drop_down : Icons.arrow_left;
-
-  Widget dropDownButton(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: HighlightButton(
-        onPressed: () {
-          setState(() {
-            expanded = true;
-          });
-          // TODO separar
-          RenderBox rb = context.findRenderObject() as RenderBox;
-          Offset offset = rb.localToGlobal(const Offset(0, height));
-          showDialog(
-            context: context,
-            barrierColor: Colors.transparent,
-            builder: (ctx) => _SelectorDialog(
-              offset: offset,
-              selected: widget._selected,
-              onChange: (acc) => setState(() {
-                widget._selected = acc;
-              }),
-            ),
-          ).then((value) => setState(() {
-                expanded = false;
-              }));
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text("${widget._selected.length} selecionadas"),
-            const SizedBox(width: 5),
-            Icon(icon),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(),
-        borderRadius: BorderRadius.circular(5),
-      ),
+    return DropDownButton(
       width: width,
       height: height,
-      alignment: Alignment.center,
-      child: dropDownButton(context),
+      onDrop: (ctx) => showPositionedDialog(
+        context: ctx,
+        builder: (_, offset) => _SelectorDialog(
+          offset: offset,
+          selected: widget._selected,
+          onChange: (acc) => setState(() {
+            widget._selected = acc;
+          }),
+        ),
+        buttonHeight: height,
+      ),
+      displayText: "${widget._selected.length} selecionadas",
     );
   }
 }
@@ -117,7 +83,8 @@ class __SelectorDialogState extends State<_SelectorDialog> {
 
   List<Account> get selected => _selected.keys
       .where((element) => _selected[element] == CheckState.checked)
-      .map((k) => Database.accounts.get(k)!)
+      .map((k) => Database.accounts.get(k))
+      .whereType<Account>()
       .toList();
 
   late Map<String, CheckState> _selected;
@@ -135,10 +102,7 @@ class __SelectorDialogState extends State<_SelectorDialog> {
     expanded = {for (AccountGroup g in Database.groups.getAll()) g.id: false};
     for (Account element in widget.selected) {
       toggle(element, value: CheckState.checked);
-      String? group = element.group;
-      if (group != null) {
-        expanded[group] = true;
-      }
+      expanded[element.group] = true;
     }
     super.initState();
   }
@@ -162,8 +126,8 @@ class __SelectorDialogState extends State<_SelectorDialog> {
     if (m.runtimeType == Account) {
       Account acc = m as Account;
       _selected[acc.id] = newValue;
-      if (acc.group != null) {
-        _selected[acc.group!] = getStateFromChildren(acc.group!);
+      if (acc.group.isNotEmpty) {
+        _selected[acc.group] = getStateFromChildren(acc.group);
       }
     } else if (m.runtimeType == AccountGroup) {
       AccountGroup g = m as AccountGroup;
@@ -215,7 +179,11 @@ class __SelectorDialogState extends State<_SelectorDialog> {
   }
 
   Widget dropDownItem(Model m) {
-    final double pad = m.runtimeType == Account ? 15 : 0;
+    double pad = 0;
+    if (m.runtimeType == Account) {
+      m as Account;
+      if (m.group.isNotEmpty) pad = 15;
+    }
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: Container(
@@ -282,6 +250,11 @@ class __SelectorDialogState extends State<_SelectorDialog> {
   List<Model> orderedItems([AccountGroup? group]) {
     List<Model> res = [];
     if (group == null) {
+      for (Account acc in Database.accounts.getAll()) {
+        if (acc.group.isEmpty) {
+          res.add(acc);
+        }
+      }
       for (AccountGroup g in Database.groups.getAll()) {
         res.addAll(orderedItems(g));
       }

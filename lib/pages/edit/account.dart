@@ -1,4 +1,4 @@
-import 'package:budget_master/models/enums.dart';
+import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/pages/edit/base.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:budget_master/utils/consts.dart';
@@ -13,9 +13,9 @@ class AccountEditDialog extends EditDialog {
               id,
               (p1) => p1.copyWith(
                 name: d['name'],
-                currency: Currency.values.byName(d['currency']),
-                type: AccountType.values.byName(d['type']),
-                group: d['group'],
+                currency: d['currency'],
+                type: d['type'],
+                group: (d['group'] as AccountGroup?)?.id ?? "",
               ),
             );
             Future.delayed(Durations.long2, Navigator.of(context).pop);

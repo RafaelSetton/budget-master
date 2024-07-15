@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/utils/app_sizes.dart';
 import 'package:collection/collection.dart';
@@ -18,8 +20,8 @@ class BarGraphRenderer extends StatelessWidget {
   static const AxisTitles noTitle =
       AxisTitles(sideTitles: SideTitles(showTitles: false));
 
-  final List<String> categories;
-  final List<String> accounts;
+  final List<TransactionCategory> categories;
+  final List<Account> accounts;
   final DateTime beginDate;
   final DateTime endDate;
   final TimePeriod interval;
@@ -60,13 +62,13 @@ class BarGraphRenderer extends StatelessWidget {
     return res;
   }
 
-  BarChartGroupData createGroup(int index, String category) {
+  BarChartGroupData createGroup(int index, TransactionCategory category) {
     return BarChartGroupData(
       x: index,
       barRods: List<BarChartRodData>.generate(
         nBars,
         (e) => BarChartRodData(
-          toY: data[category]![e] ?? 0,
+          toY: data[category.id]![e] ?? 0,
           color: colors[e],
           borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
         ),
@@ -140,7 +142,7 @@ class BarGraphRenderer extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
-                return Text(categories[value.toInt()]);
+                return Text(categories[value.toInt()].fullName);
               },
             ),
           ),

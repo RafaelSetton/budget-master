@@ -1,13 +1,18 @@
 import 'package:budget_master/components/creation_form/field.dart';
+import 'package:budget_master/components/creation_form/selectors/account/multi_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/account/single_selector.dart';
+import 'package:budget_master/components/creation_form/selectors/account_type_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/bool_field.dart';
+import 'package:budget_master/components/creation_form/selectors/category/multi_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/category/single_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/color_field.dart';
+import 'package:budget_master/components/creation_form/selectors/currency_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/date_field.dart';
-import 'package:budget_master/components/creation_form/selectors/multiple_selection_field.dart';
+import 'package:budget_master/components/creation_form/selectors/group_selector.dart';
 import 'package:budget_master/components/creation_form/selectors/number_field.dart';
-import 'package:budget_master/components/creation_form/selectors/single_selection_field.dart';
 import 'package:budget_master/components/creation_form/selectors/text_field.dart';
+import 'package:budget_master/components/creation_form/selectors/time_period_selector.dart';
+import 'package:budget_master/components/creation_form/selectors/transaction_type_selector.dart';
 import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/budget.dart';
@@ -43,26 +48,17 @@ List<CreationFormField> accountFormFields([Account? account]) => [
       CreationFormField(
         title: "Grupo",
         identifier: "group",
-        selector: SingleSelector(
-          options: Database.groups.getIDs(),
-          selectedOption: account?.group,
-        ),
+        selector: GroupSelector(selectedId: account?.group),
       ),
       CreationFormField(
         title: "Tipo",
         identifier: "type",
-        selector: SingleSelector(
-          optional: false,
-          options: AccountType.values.asNameMap().keys.toList(),
-        ),
+        selector: AccountTypeSelector(),
       ),
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: SingleSelector(
-          optional: false,
-          options: Currency.values.asNameMap().keys.toList(),
-        ),
+        selector: CurrencySelector(),
       ),
     ];
 
@@ -85,25 +81,24 @@ List<CreationFormField> budgetFormFields([Budget? budget]) => [
       CreationFormField(
         title: "Contas",
         identifier: "accounts",
-        selector: MultipleSelector(
-          Database.accounts.getAll().map((e) => e.id).toList(),
-          display: (id) => Database.accounts.get(id)!.name,
-          preSelected: budget?.accounts,
-        ),
+        selector: AccountMultiSelector(
+            selected: budget?.accounts
+                .map((e) => Database.accounts.get(e)!)
+                .toList()),
       ),
       CreationFormField(
         title: "Categorias",
         identifier: "categories",
-        selector: CategorySingleSelector(),
+        selector: CategoryMultiSelector(
+          selected: budget?.categories
+              .map((e) => Database.categories.get(e)!)
+              .toList(),
+        ),
       ),
       CreationFormField(
         title: "Intervalo",
         identifier: "period",
-        selector: SingleSelector(
-          options: TimePeriod.values.asNameMap().keys.toList(),
-          optional: false,
-          selectedOption: budget?.period.name,
-        ),
+        selector: TimePeriodSelector(),
       ),
       CreationFormField(
         title: "Rollover",
@@ -129,10 +124,9 @@ List<CreationFormField> expenseIncomeFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Tipo",
         identifier: "type",
-        selector: SingleSelector(
-          options: const ['expense', 'income'],
-          optional: false,
-          selectedOption: transaction?.type.name,
+        selector: TransactionTypeSelector(
+          options: const [TransactionType.expense, TransactionType.income],
+          selected: transaction?.type,
         ),
       ),
       ..._transactionBaseFields(transaction),
@@ -145,10 +139,7 @@ List<CreationFormField> expenseIncomeFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: SingleSelector(
-          optional: false,
-          options: Currency.values.asNameMap().keys.toList(),
-        ),
+        selector: CurrencySelector(),
       ),
       CreationFormField(
         title: "Categoria",
@@ -169,20 +160,19 @@ List<CreationFormField> transferFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Da Conta",
         identifier: "accountOut",
-        selector: TextSelector(initialValue: transaction?.accountOut),
+        selector: AccountSingleSelector(
+            selected: Database.accounts.get(transaction?.accountOut)),
       ),
       CreationFormField(
         title: "Para a Conta",
         identifier: "accountIn",
-        selector: TextSelector(initialValue: transaction?.accountIn),
+        selector: AccountSingleSelector(
+            selected: Database.accounts.get(transaction?.accountIn)),
       ),
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: SingleSelector(
-          optional: false,
-          options: Currency.values.asNameMap().keys.toList(),
-        ),
+        selector: CurrencySelector(),
       ),
       CreationFormField(
         title: "Valor",
@@ -198,10 +188,9 @@ List<CreationFormField> buySellFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Tipo",
         identifier: "type",
-        selector: SingleSelector(
-          options: const ['buy', 'sell'],
-          optional: false,
-          selectedOption: transaction?.type.name,
+        selector: TransactionTypeSelector(
+          options: const [TransactionType.buy, TransactionType.sell],
+          selected: transaction?.type,
         ),
       ),
       ..._transactionBaseFields(transaction),
@@ -214,10 +203,7 @@ List<CreationFormField> buySellFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: SingleSelector(
-          optional: false,
-          options: Currency.values.asNameMap().keys.toList(),
-        ),
+        selector: CurrencySelector(),
       ),
       CreationFormField(
         title: "Valor",

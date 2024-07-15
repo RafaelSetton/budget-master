@@ -8,8 +8,7 @@ class Account extends Model {
   @override
   String get id => created.millisecondsSinceEpoch.toString();
 
-  String name;
-  String? group;
+  String group;
   DateTime created;
   AccountType type;
   Currency currency;
@@ -18,16 +17,16 @@ class Account extends Model {
   double get balance => _balance;
 
   Account({
-    required this.name,
+    required super.name,
     DateTime? created,
     required this.type,
     required this.currency,
     double? balance,
-    this.group,
-    DateTime? edited,
+    String? group,
+    super.edited,
   })  : _balance = balance ?? 0,
         created = created ?? DateTime.now(),
-        super(edited: edited);
+        group = group ?? "";
 
   Account copyWith({
     String? name,

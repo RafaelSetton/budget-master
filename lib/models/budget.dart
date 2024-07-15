@@ -12,7 +12,6 @@ class Budget extends Model {
 
   final bool rollover;
   final double value;
-  final String name;
   final DateTime created;
   final DateTime begin;
   final TimePeriod period;
@@ -44,15 +43,14 @@ class Budget extends Model {
   Budget({
     required this.rollover,
     required this.value,
-    required this.name,
+    required super.name,
     DateTime? created,
     required this.begin,
     required this.period,
     required this.categories,
     required this.accounts,
-    DateTime? edited,
-  })  : created = created ?? DateTime.now(),
-        super(edited: edited);
+    super.edited,
+  }) : created = created ?? DateTime.now();
 
   Budget copyWith({
     bool? rollover,

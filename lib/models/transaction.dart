@@ -74,7 +74,7 @@ class Transaction extends Model {
 
   Transaction._main({
     String? id,
-    DateTime? edited,
+    super.edited,
     required this.currency,
     required this.type,
     required this.dateTime,
@@ -90,7 +90,7 @@ class Transaction extends Model {
   })  : _totalValue = totalValue,
         _pricePerShare = pricePerShare,
         _id = id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        super(edited: edited);
+        super(name: "");
 
   factory Transaction.expenseIncome({
     String? id,

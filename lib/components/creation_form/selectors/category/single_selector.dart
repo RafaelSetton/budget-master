@@ -1,7 +1,8 @@
 import 'package:budget_master/components/creation_form/selectors/selector.dart';
-import 'package:budget_master/components/highlight_button.dart';
+import 'package:budget_master/components/drop_down_button.dart';
 import 'package:budget_master/models/category.dart';
 import 'package:budget_master/services/db.dart';
+import 'package:budget_master/utils/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:pair/pair.dart';
 
@@ -33,91 +34,25 @@ class _CategorySingleSelectorState extends State<CategorySingleSelector> {
   static const double width = 150;
   static const double height = 35;
 
-  final ScrollController scrollController = ScrollController();
-  bool expanded = false;
-  IconData get icon => expanded ? Icons.arrow_drop_down : Icons.arrow_left;
-
-  @override
-  void initState() {
-    Future.delayed(
-        Durations.short1,
-        () =>
-            scrollController.jumpTo(scrollController.position.maxScrollExtent));
-    super.initState();
-  }
-
-  Widget dropDownButton(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: HighlightButton(
-        onHover: (b) {
-          if (b) {
-            scrollController.jumpTo(0);
-            Future.delayed(
-              Durations.long2,
-              () => scrollController.animateTo(
-                scrollController.position.maxScrollExtent,
-                duration: Duration(
-                    milliseconds:
-                        scrollController.position.maxScrollExtent.toInt() * 13),
-                curve: Curves.linear,
-              ),
-            );
-          }
-        },
-        onPressed: () {
-          setState(() {
-            expanded = true;
-          });
-          RenderBox rb = context.findRenderObject() as RenderBox;
-          Offset offset = rb.localToGlobal(const Offset(0, height));
-          showDialog(
-            context: context,
-            barrierColor: Colors.transparent,
-            builder: (ctx) => _SelectorDialog(
-              offset: offset,
-              selected: widget._selected,
-              onChange: (acc) => setState(() {
-                widget._selected = acc;
-              }),
-              allowRoots: widget.allowRoots,
-              optional: widget.optional,
-            ),
-          ).then((value) => setState(() {
-                expanded = false;
-              }));
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SizedBox(
-              width: width - 55,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                controller: scrollController,
-                child: Text(widget._selected?.fullName ?? "Nenhuma"),
-              ),
-            ),
-            const SizedBox(width: 5),
-            Icon(icon),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(),
-        borderRadius: BorderRadius.circular(5),
-      ),
+    return DropDownButton(
       width: width,
       height: height,
-      alignment: Alignment.center,
-      child: dropDownButton(context),
+      onDrop: (ctx) => showPositionedDialog(
+        context: ctx,
+        builder: (_, offset) => _SelectorDialog(
+          offset: offset,
+          selected: widget._selected,
+          onChange: (acc) => setState(() {
+            widget._selected = acc;
+          }),
+          allowRoots: widget.allowRoots,
+          optional: widget.optional,
+        ),
+        buttonHeight: height,
+      ),
+      displayText: widget._selected?.fullName ?? "Nenhuma",
     );
   }
 }
@@ -202,7 +137,7 @@ class __SelectorDialogState extends State<_SelectorDialog> {
             }
           }
           setState(() {
-            expanded[tc.id] = !expanded[tc.id]!;
+            expanded[tc.id] = !(expanded[tc.id] ?? false);
           });
         },
         child: Container(

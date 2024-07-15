@@ -9,18 +9,16 @@ class AccountGroup extends Model {
   String get id => _id;
 
   final String _id;
-  String name;
   List<String> accounts;
   MaterialColor color;
 
   AccountGroup({
     String? id,
-    required this.name,
+    required super.name,
     this.accounts = const [],
     required this.color,
-    DateTime? edited,
-  })  : _id = id ?? name,
-        super(edited: edited);
+    super.edited,
+  }) : _id = id ?? name;
 
   AccountGroup copyWith({
     String? id,

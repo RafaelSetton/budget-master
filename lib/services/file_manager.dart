@@ -13,33 +13,28 @@ class FileManager {
   Future _save() async {
     await _write(
       "accounts",
-      json.encode(Database.accounts.asMap
-          .map((key, value) => MapEntry(key, value.toMap()))),
+      json.encode(Database.accounts.getAll().map((e) => e.toMap()).toList()),
     );
     await _write(
       "groups",
-      json.encode(Database.groups.asMap
-          .map((key, value) => MapEntry(key, value.toMap()))),
+      json.encode(Database.groups.getAll().map((e) => e.toMap()).toList()),
     );
     await _write(
       "transactions",
-      json.encode(Database.transactions.asMap
-          .map((key, value) => MapEntry(key, value.toMap()))),
+      json.encode(
+          Database.transactions.getAll().map((e) => e.toMap()).toList()),
     );
     await _write(
       "budgets",
-      json.encode(Database.budgets.asMap
-          .map((key, value) => MapEntry(key, value.toMap()))),
+      json.encode(Database.budgets.getAll().map((e) => e.toMap()).toList()),
     );
     await _write(
       "scheduled",
-      json.encode(Database.scheduled.asMap
-          .map((key, value) => MapEntry(key, value.toMap()))),
+      json.encode(Database.scheduled.getAll().map((e) => e.toMap()).toList()),
     );
     await _write(
       "categories",
-      json.encode(Database.categories.asMap
-          .map((key, value) => MapEntry(key, value.toMap()))),
+      json.encode(Database.categories.getAll().map((e) => e.toMap()).toList()),
     );
   }
 
@@ -49,7 +44,7 @@ class FileManager {
     if (shouldSave) {
       debugPrint("Saving data...");
       _save();
-      shouldSave = false;
+      //shouldSave = false;
     }
 
     Future.delayed(const Duration(seconds: 30), start);

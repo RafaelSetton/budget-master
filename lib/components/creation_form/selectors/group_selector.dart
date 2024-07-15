@@ -1,26 +1,27 @@
 import 'package:budget_master/components/creation_form/selectors/selector.dart';
 import 'package:budget_master/components/drop_down_button.dart';
-import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:budget_master/utils/functions.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class AccountSingleSelector extends CreationFormSelector<Account> {
-  AccountSingleSelector({super.key, Account? selected}) {
-    _selected = selected ?? Database.accounts.getAll().first;
+class GroupSelector extends CreationFormSelector<AccountGroup?> {
+  GroupSelector({super.key, AccountGroup? selected, String? selectedId}) {
+    assert(selected == null || selectedId == null);
+    _selected = selected ?? Database.groups.get(selectedId);
   }
 
-  @override
-  State<AccountSingleSelector> createState() => _AccountSingleSelectorState();
-
-  late Account _selected;
+  late AccountGroup? _selected;
 
   @override
-  Account get value => _selected;
+  State<GroupSelector> createState() => _GroupSelectorState();
+
+  @override
+  AccountGroup? get value => _selected;
 }
 
-class _AccountSingleSelectorState extends State<AccountSingleSelector> {
+class _GroupSelectorState extends State<GroupSelector> {
   static const double width = 150;
   static const double height = 35;
 
@@ -31,7 +32,7 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
       height: height,
       onDrop: (ctx) => showPositionedDialog(
         context: ctx,
-        builder: (ctx, offset) => _SelectorDialog(
+        builder: (_, offset) => _SelectorDialog(
           offset: offset,
           selected: widget._selected,
           onChange: (acc) => setState(() {
@@ -40,43 +41,45 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.name,
+      displayText: widget._selected?.name ?? "Nenhum",
     );
   }
 }
 
 class _SelectorDialog extends StatefulWidget {
   const _SelectorDialog(
-      {required this.offset, required this.onChange, required this.selected});
+      {required this.offset, required this.onChange, this.selected});
 
   final Offset offset;
-  final void Function(Account) onChange;
-  final Account selected;
+  final void Function(AccountGroup?) onChange;
+  final AccountGroup? selected;
 
   @override
   State<_SelectorDialog> createState() => __SelectorDialogState();
 }
 
 class __SelectorDialogState extends State<_SelectorDialog> {
-  late Account selected;
+  late AccountGroup? selected;
+  static final AccountGroup nullSimulator =
+      AccountGroup(name: "Nenhum", color: Colors.grey);
 
   @override
   void initState() {
-    selected = widget.selected;
+    selected = widget.selected ?? nullSimulator;
     super.initState();
   }
 
-  Widget dropDownItem(Account acc) {
+  Widget dropDownItem(AccountGroup acc) {
     const double selectorSize = 15;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          widget.onChange(acc);
           setState(() {
             selected = acc;
           });
+          widget.onChange(acc == nullSimulator ? null : acc);
         },
         child: Container(
           width: 150,
@@ -123,7 +126,10 @@ class __SelectorDialogState extends State<_SelectorDialog> {
           top: widget.offset.dy,
           child: SingleChildScrollView(
             child: Column(
-              children: Database.accounts.getAll().map(dropDownItem).toList(),
+              children: [
+                dropDownItem(nullSimulator),
+                ...Database.groups.getAll().map(dropDownItem).toList(),
+              ],
             ),
           ),
         )

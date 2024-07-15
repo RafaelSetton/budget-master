@@ -18,17 +18,20 @@ class ScheduledTransaction extends Model {
     required this.transaction,
     required this.nextDate,
     required this.interval,
+    required super.name,
     this.autoCreate = false,
-    DateTime? edited,
-  }) : super(edited: edited);
+    super.edited,
+  });
 
   ScheduledTransaction copyWith({
     Transaction? transaction,
     DateTime? nextDate,
     TimeInterval? interval,
     bool? autoCreate,
+    String? name,
   }) {
     return ScheduledTransaction(
+      name: name ?? this.name,
       transaction: transaction ?? this.transaction,
       nextDate: nextDate ?? this.nextDate,
       interval: interval ?? this.interval,
@@ -43,6 +46,7 @@ class ScheduledTransaction extends Model {
       'nextDate': nextDate.millisecondsSinceEpoch,
       'interval': interval.toMap(),
       'autoCreate': autoCreate,
+      'name': name,
     };
   }
 
@@ -53,6 +57,7 @@ class ScheduledTransaction extends Model {
       nextDate: DateTime.fromMillisecondsSinceEpoch(map['nextDate'] as int),
       interval: TimeInterval.fromMap(map['interval']),
       autoCreate: map['autoCreate'] as bool,
+      name: map['name'] ?? "",
     );
   }
 
