@@ -7,17 +7,11 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class AccountSingleSelector extends CreationFormSelector<Account> {
-  AccountSingleSelector({super.key, Account? selected}) {
-    _selected = selected ?? Database.accounts.getAll().first;
-  }
+  AccountSingleSelector({super.key, super.controller, Account? defaultValue})
+      : super(defaultValue: defaultValue ?? Database.accounts.getAll().first);
 
   @override
   State<AccountSingleSelector> createState() => _AccountSingleSelectorState();
-
-  late Account _selected;
-
-  @override
-  Account get value => _selected;
 }
 
 class _AccountSingleSelectorState extends State<AccountSingleSelector> {
@@ -33,14 +27,14 @@ class _AccountSingleSelectorState extends State<AccountSingleSelector> {
         context: ctx,
         builder: (ctx, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.name,
+      displayText: widget.controller.value.name,
     );
   }
 }

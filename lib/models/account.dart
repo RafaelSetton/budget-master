@@ -1,8 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/model.dart';
+import 'package:budget_master/services/db.dart';
 
 class Account extends Model {
   @override
@@ -15,6 +17,8 @@ class Account extends Model {
   double _balance;
 
   double get balance => _balance;
+
+  AccountGroup? get getGroup => Database.groups.get(group);
 
   Account({
     required super.name,

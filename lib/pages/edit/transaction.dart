@@ -31,6 +31,7 @@ class TransactionEditDialog extends EditDialog {
     String? accountIn;
     String? accountOut;
     String? assetName;
+    String? payee;
     Currency? currency;
     double? nShares;
     double? pricePerShare;
@@ -43,6 +44,7 @@ class TransactionEditDialog extends EditDialog {
       } else {
         accountIn = (data['account'] as Account).id;
       }
+      payee = data['payee'];
       currency = data['currency'];
       categories = {
         (data['category'] as TransactionCategory).id: data['value']
@@ -70,6 +72,7 @@ class TransactionEditDialog extends EditDialog {
       totalValue: totalValue,
       type: type,
       categories: categories,
+      payee: payee,
     );
   }
 

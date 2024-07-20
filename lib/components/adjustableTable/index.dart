@@ -1,5 +1,3 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
-
 import 'package:budget_master/components/adjustableTable/header.dart';
 import 'package:budget_master/models/transaction.dart';
 import 'package:budget_master/pages/edit/transaction.dart';
@@ -19,7 +17,6 @@ class AdjustableTable extends StatefulWidget {
 
 class _AdjustableTableState extends State<AdjustableTable> {
   late List<AdjustableHeaderCell> headers;
-  double height = 50;
 
   @override
   initState() {
@@ -57,6 +54,9 @@ class _AdjustableTableState extends State<AdjustableTable> {
     );
   }
 
+  double get width => 1100;
+  double get height => 200;
+
   Widget transactionRow(MapEntry e) {
     int index = e.key;
     Transaction transaction = e.value;
@@ -81,6 +81,7 @@ class _AdjustableTableState extends State<AdjustableTable> {
                 child: Text(
                   attrs[e.text],
                   overflow: TextOverflow.ellipsis,
+                  // TODO (Transaction Display) Color Value
                 ),
               ),
             )
@@ -93,6 +94,8 @@ class _AdjustableTableState extends State<AdjustableTable> {
   Widget build(BuildContext context) {
     List<Widget> rows =
         widget.transactions.asMap().entries.map(transactionRow).toList();
+
+    //TODO (2D Scroll)
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -18,21 +18,21 @@ import 'package:budget_master/models/account_group.dart';
 import 'package:budget_master/models/budget.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/transaction.dart';
-import 'package:budget_master/services/db.dart';
+import 'package:flutter/material.dart';
 
 List<CreationFormField> groupFormFields([AccountGroup? group]) => [
       CreationFormField(
         title: "Nome",
         identifier: "name",
         selector: TextSelector(
-          initialValue: group?.name,
+          defaultValue: group?.name,
         ),
       ),
       CreationFormField(
         title: "Cor",
         identifier: "color",
         selector: ColorSelector(
-          initialColor: group?.color,
+          defaultValue: group?.color,
         ),
       ),
     ];
@@ -41,24 +41,22 @@ List<CreationFormField> accountFormFields([Account? account]) => [
       CreationFormField(
         title: "Nome",
         identifier: "name",
-        selector: TextSelector(
-          initialValue: account?.name,
-        ),
+        selector: TextSelector(defaultValue: account?.name),
       ),
       CreationFormField(
         title: "Grupo",
         identifier: "group",
-        selector: GroupSelector(selectedId: account?.group),
+        selector: GroupSelector(defaultValue: account?.getGroup),
       ),
       CreationFormField(
         title: "Tipo",
         identifier: "type",
-        selector: AccountTypeSelector(),
+        selector: AccountTypeSelector(defaultValue: account?.type),
       ),
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: CurrencySelector(),
+        selector: CurrencySelector(defaultValue: account?.currency),
       ),
     ];
 
@@ -66,44 +64,37 @@ List<CreationFormField> budgetFormFields([Budget? budget]) => [
       CreationFormField(
         title: "Nome",
         identifier: "name",
-        selector: TextSelector(initialValue: budget?.name),
+        selector: TextSelector(defaultValue: budget?.name),
       ),
       CreationFormField(
         title: "Valor",
         identifier: "value",
-        selector: NumberSelector(initialValue: budget?.value),
+        selector: NumberSelector(defaultValue: budget?.value),
       ),
       CreationFormField(
         title: "Data de Inicio",
         identifier: "begin",
-        selector: DateSelector(initialDate: budget?.begin),
+        selector: DateSelector(defaultValue: budget?.begin),
       ),
       CreationFormField(
         title: "Contas",
         identifier: "accounts",
-        selector: AccountMultiSelector(
-            selected: budget?.accounts
-                .map((e) => Database.accounts.get(e)!)
-                .toList()),
+        selector: AccountMultiSelector(defaultValue: budget?.getAccounts),
       ),
       CreationFormField(
         title: "Categorias",
         identifier: "categories",
-        selector: CategoryMultiSelector(
-          selected: budget?.categories
-              .map((e) => Database.categories.get(e)!)
-              .toList(),
-        ),
+        selector: CategoryMultiSelector(defaultValue: budget?.getCategories),
       ),
       CreationFormField(
         title: "Intervalo",
         identifier: "period",
-        selector: TimePeriodSelector(),
+        selector: TimePeriodSelector(defaultValue: budget?.period),
       ),
       CreationFormField(
         title: "Rollover",
         identifier: "rollover",
-        selector: BoolSelector(isChecked: budget?.rollover),
+        selector: BoolSelector(defaultValue: budget?.rollover),
       ),
     ];
 
@@ -111,12 +102,12 @@ List<CreationFormField> _transactionBaseFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Descrição",
         identifier: "description",
-        selector: TextSelector(initialValue: transaction?.description),
+        selector: TextSelector(defaultValue: transaction?.description),
       ),
       CreationFormField(
         title: "Data",
         identifier: "dateTime",
-        selector: DateSelector(initialDate: transaction?.dateTime),
+        selector: DateSelector(defaultValue: transaction?.dateTime),
       ),
     ];
 
@@ -126,7 +117,7 @@ List<CreationFormField> expenseIncomeFormFields([Transaction? transaction]) => [
         identifier: "type",
         selector: TransactionTypeSelector(
           options: const [TransactionType.expense, TransactionType.income],
-          selected: transaction?.type,
+          defaultValue: transaction?.type,
         ),
       ),
       ..._transactionBaseFields(transaction),
@@ -134,24 +125,31 @@ List<CreationFormField> expenseIncomeFormFields([Transaction? transaction]) => [
         title: "Conta",
         identifier: "account",
         selector: AccountSingleSelector(
-            /* selected: transaction?.accountIn ?? transaction?.accountOut */),
+            defaultValue: transaction?.type == TransactionType.expense
+                ? transaction?.getAccountOut
+                : transaction?.getAccountIn),
       ),
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: CurrencySelector(),
+        selector: CurrencySelector(defaultValue: transaction?.currency),
       ),
       CreationFormField(
         title: "Categoria",
         identifier: "category",
-        selector: CategorySingleSelector(),
+        selector: CategorySingleSelector(
+            allowRoots: false,
+            defaultValue: transaction?.getCategories?.firstOrNull),
       ),
       CreationFormField(
         title: "Valor",
         identifier: "value",
-        selector: NumberSelector(
-          initialValue: transaction?.totalValue,
-        ),
+        selector: NumberSelector(defaultValue: transaction?.totalValue),
+      ),
+      CreationFormField(
+        title: "Beneficiário",
+        identifier: "payee",
+        selector: TextSelector(defaultValue: transaction?.payee),
       ),
     ];
 
@@ -160,56 +158,86 @@ List<CreationFormField> transferFormFields([Transaction? transaction]) => [
       CreationFormField(
         title: "Da Conta",
         identifier: "accountOut",
-        selector: AccountSingleSelector(
-            selected: Database.accounts.get(transaction?.accountOut)),
+        selector:
+            AccountSingleSelector(defaultValue: transaction?.getAccountOut),
       ),
       CreationFormField(
         title: "Para a Conta",
         identifier: "accountIn",
-        selector: AccountSingleSelector(
-            selected: Database.accounts.get(transaction?.accountIn)),
+        selector:
+            AccountSingleSelector(defaultValue: transaction?.getAccountIn),
       ),
       CreationFormField(
         title: "Moeda",
         identifier: "currency",
-        selector: CurrencySelector(),
+        selector: CurrencySelector(defaultValue: transaction?.currency),
       ),
       CreationFormField(
         title: "Valor",
         identifier: "value",
-        selector: NumberSelector(
-          initialValue: transaction?.totalValue,
-        ),
+        selector: NumberSelector(defaultValue: transaction?.totalValue),
       ),
     ];
 
 // TODO (BuySell)
-List<CreationFormField> buySellFormFields([Transaction? transaction]) => [
-      CreationFormField(
-        title: "Tipo",
-        identifier: "type",
-        selector: TransactionTypeSelector(
-          options: const [TransactionType.buy, TransactionType.sell],
-          selected: transaction?.type,
-        ),
+List<CreationFormField> buySellFormFields([Transaction? transaction]) {
+  ValueNotifier<double> valueController =
+      ValueNotifier(transaction?.totalValue ?? 0);
+  ValueNotifier<double> nSharesController =
+      ValueNotifier(transaction?.nShares ?? 0);
+  ValueNotifier<double> shareValueController =
+      ValueNotifier(transaction?.pricePerShare ?? 0);
+
+  valueController.addListener(() {
+    shareValueController.value =
+        valueController.value / nSharesController.value;
+  });
+  shareValueController.addListener(() {
+    valueController.value =
+        shareValueController.value * nSharesController.value;
+  });
+  nSharesController.addListener(() {
+    valueController.value =
+        shareValueController.value * nSharesController.value;
+  });
+
+  return [
+    CreationFormField(
+      title: "Tipo",
+      identifier: "type",
+      selector: TransactionTypeSelector(
+        options: const [TransactionType.buy, TransactionType.sell],
+        defaultValue: transaction?.type,
       ),
-      ..._transactionBaseFields(transaction),
-      CreationFormField(
-        title: "Conta",
-        identifier: "account",
-        selector: TextSelector(
-            initialValue: transaction?.accountIn ?? transaction?.accountOut),
-      ),
-      CreationFormField(
-        title: "Moeda",
-        identifier: "currency",
-        selector: CurrencySelector(),
-      ),
-      CreationFormField(
-        title: "Valor",
-        identifier: "value",
-        selector: NumberSelector(
-          initialValue: transaction?.totalValue,
-        ),
-      ),
-    ];
+    ),
+    ..._transactionBaseFields(transaction),
+    CreationFormField(
+      title: "Conta",
+      identifier: "account",
+      selector: AccountSingleSelector(
+          defaultValue: transaction?.type == TransactionType.expense
+              ? transaction?.getAccountOut
+              : transaction?.getAccountIn),
+    ),
+    CreationFormField(
+      title: "Moeda",
+      identifier: "currency",
+      selector: CurrencySelector(defaultValue: transaction?.currency),
+    ),
+    CreationFormField(
+      title: "Valor total",
+      identifier: "totalValue",
+      selector: NumberSelector(controller: valueController),
+    ),
+    CreationFormField(
+      title: "Valor por Ativo",
+      identifier: "pricePerShare",
+      selector: NumberSelector(controller: shareValueController),
+    ),
+    CreationFormField(
+      title: "Número de Ativos",
+      identifier: "nShares",
+      selector: NumberSelector(controller: nSharesController),
+    ),
+  ];
+}

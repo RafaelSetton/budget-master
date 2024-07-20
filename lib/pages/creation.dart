@@ -22,7 +22,7 @@ class _CreationPopUpState extends State<CreationPopUp> {
   CreationForm get groupCreationPage {
     return CreationForm(
       onSubmit: (m) {
-        Database.groups.post(AccountGroup.fromMap(m));
+        Database.groups.post(AccountGroup(name: m['name'], color: m['color']));
         pop();
       },
       fields: groupFormFields(),

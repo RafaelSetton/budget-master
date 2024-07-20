@@ -2,24 +2,17 @@ import 'package:budget_master/components/creation_form/selectors/selector.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class ColorSelector extends CreationFormSelector<int> {
-  ColorSelector({super.key, int? initialIndex, MaterialColor? initialColor})
-      : _selected = initialIndex ??
-            (initialColor != null ? Colors.primaries.indexOf(initialColor) : 0);
+class ColorSelector extends CreationFormSelector<MaterialColor> {
+  ColorSelector({super.key, super.controller, super.defaultValue = Colors.red});
 
   @override
   State<ColorSelector> createState() => _ColorSelectorState();
-
-  int _selected;
-
-  @override
-  int get value => _selected;
 }
 
 class _ColorSelectorState extends State<ColorSelector> {
-  void onChange(int value) {
+  void onChange(MaterialColor value) {
     setState(() {
-      widget._selected = value;
+      widget.controller.value = value;
     });
   }
 
@@ -31,13 +24,13 @@ class _ColorSelectorState extends State<ColorSelector> {
         barrierColor: Colors.transparent,
         builder: (context) => _ColorDialog(
           details: details,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: onChange,
         ),
       ),
       child: Icon(
         Icons.square,
-        color: Colors.primaries[widget._selected],
+        color: widget.controller.value,
       ),
     );
   }
@@ -49,8 +42,8 @@ class _ColorDialog extends StatefulWidget {
       {required this.details, required this.selected, required this.onChange});
 
   final TapDownDetails details;
-  final Function(int) onChange;
-  int selected;
+  final Function(MaterialColor) onChange;
+  MaterialColor selected;
 
   @override
   State<_ColorDialog> createState() => __ColorDialogState();
@@ -58,22 +51,23 @@ class _ColorDialog extends StatefulWidget {
 
 class __ColorDialogState extends State<_ColorDialog> {
   Widget itemBuilder(BuildContext context, int index) {
+    MaterialColor color = Colors.primaries[index];
     return GestureDetector(
       onTap: () {
         setState(() {
-          widget.selected = index;
+          widget.selected = color;
         });
-        widget.onChange(index);
+        widget.onChange(color);
       },
       child: Container(
         decoration: BoxDecoration(
-          color: index == widget.selected ? Colors.white30 : null,
+          color: color == widget.selected ? Colors.white30 : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Container(
           margin: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: Colors.primaries[index],
+            color: color,
             borderRadius: BorderRadius.circular(3),
           ),
         ),

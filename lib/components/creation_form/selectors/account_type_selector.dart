@@ -6,13 +6,8 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class AccountTypeSelector extends CreationFormSelector<AccountType> {
-  AccountTypeSelector({super.key, AccountType? selected})
-      : _selected = selected ?? AccountType.checking;
-
-  late AccountType _selected;
-
-  @override
-  AccountType get value => _selected;
+  AccountTypeSelector(
+      {super.key, super.controller, super.defaultValue = AccountType.checking});
 
   @override
   State<StatefulWidget> createState() => _AccountTypeSelectorState();
@@ -31,14 +26,14 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.display,
+      displayText: widget.controller.value.display,
     );
   }
 }

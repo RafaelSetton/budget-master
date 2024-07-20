@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/model.dart';
+import 'package:budget_master/services/db.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'dart:core';
@@ -59,10 +62,19 @@ class Transaction extends Model {
     if (isBuySell) _pricePerShare = _totalValue / nShares!;
   }
 
-  Map<String, dynamic> display() {
+  Account? get getAccountIn => Database.accounts.get(accountIn);
+  Account? get getAccountOut => Database.accounts.get(accountOut);
+
+  List<TransactionCategory>? get getCategories => categories?.keys
+      .map(Database.categories.get)
+      .whereType<TransactionCategory>()
+      .toList();
+
+  Map<String, String> display() {
     //TODO (Transaction)
     return {
-      "Conta": accountIn,
+      "Conta de Entrada": getAccountIn?.name ?? "",
+      "Conta de Saída": getAccountOut?.name ?? "",
       "Valor": totalValue.toString(),
       "Data": DateFormat('dd/MM/yyyy').format(dateTime),
       "Descrição": description,
@@ -98,7 +110,7 @@ class Transaction extends Model {
     required Currency currency,
     required TransactionType type,
     required DateTime dateTime,
-    required String accountIn,
+    required String account,
     required Map<String, double> categories,
     required String description,
     required String payee,
@@ -111,14 +123,15 @@ class Transaction extends Model {
       type: type,
       dateTime: dateTime,
       totalValue: categories.values.sum,
-      accountIn: accountIn,
+      accountIn: type == TransactionType.income ? account : null,
+      accountOut: type == TransactionType.expense ? account : null,
       categories: categories,
       payee: payee,
     );
   }
 
   factory Transaction.buySellFromTotal({
-    required String id,
+    String? id,
     required DateTime edited,
     required Currency currency,
     required TransactionType type,
@@ -145,7 +158,7 @@ class Transaction extends Model {
   }
 
   factory Transaction.buySellPerShare({
-    required String id,
+    String? id,
     required DateTime edited,
     required Currency currency,
     required TransactionType type,
@@ -208,6 +221,7 @@ class Transaction extends Model {
     double? pricePerShare,
     String? assetName,
     TransactionType? type,
+    String? payee,
   }) {
     return Transaction._main(
       id: id ?? this.id,
@@ -223,6 +237,7 @@ class Transaction extends Model {
       pricePerShare: pricePerShare ?? _pricePerShare,
       assetName: assetName ?? this.assetName,
       type: type ?? this.type,
+      payee: payee ?? this.payee,
     );
   }
 
@@ -252,7 +267,7 @@ class Transaction extends Model {
       currency: Currency.values.byName(map['currency']),
       dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
       totalValue: (map['totalValue'] as num).toDouble(),
-      accountIn: map['accountIn'] as String,
+      accountIn: map['accountIn'] as String?,
       description: map['description'] as String,
       accountOut: map['accountOut'] as String?,
       categories: map['categories'] != null
@@ -276,6 +291,7 @@ class Transaction extends Model {
       Required:
         id: $id,
         edited: $edited, 
+        type: $type,
         currency: $currency, 
         dateTime: $dateTime, 
         totalValue: $_totalValue, 

@@ -4,16 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // ignore: must_be_immutable
-class TextSelector extends CreationFormSelector {
+class TextSelector extends CreationFormSelector<String> {
   TextSelector(
-      {super.key, String? initialValue, this.inputFormatters = const []})
-      : _value = initialValue ?? "";
+      {super.key,
+      super.controller,
+      String? defaultValue,
+      this.inputFormatters = const []})
+      : super(defaultValue: defaultValue ?? "");
 
   final List<TextInputFormatter> inputFormatters;
-  String _value;
-
-  @override
-  String get value => _value;
 
   @override
   State<TextSelector> createState() => _TextSelectorState();
@@ -26,9 +25,9 @@ class _TextSelectorState extends State<TextSelector> {
 
   @override
   void initState() {
-    _controller.text = widget._value;
+    _controller.text = widget.controller.value;
     _controller.addListener(() {
-      widget._value = _controller.text;
+      widget.controller.value = _controller.text;
     });
     super.initState();
   }

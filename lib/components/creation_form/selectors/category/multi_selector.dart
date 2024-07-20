@@ -10,16 +10,11 @@ import 'package:pair/pair.dart';
 // ignore: must_be_immutable
 class CategoryMultiSelector
     extends CreationFormSelector<List<TransactionCategory>> {
-  CategoryMultiSelector({super.key, List<TransactionCategory>? selected})
-      : _selected = selected ?? const [];
+  CategoryMultiSelector(
+      {super.key, super.controller, super.defaultValue = const []});
 
   @override
   State<CategoryMultiSelector> createState() => _CategoryMultiSelectorState();
-
-  List<TransactionCategory> _selected;
-
-  @override
-  List<TransactionCategory> get value => _selected;
 }
 
 class _CategoryMultiSelectorState extends State<CategoryMultiSelector> {
@@ -35,14 +30,14 @@ class _CategoryMultiSelectorState extends State<CategoryMultiSelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: "${widget._selected.length} selecionadas",
+      displayText: "${widget.controller.value.length} selecionadas",
     );
   }
 }

@@ -4,21 +4,23 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
 class NumberSelector extends CreationFormSelector<double> {
-  NumberSelector({super.key, double? initialValue})
-      : _textSelector = TextSelector(
-          initialValue: initialValue?.toString(),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp("[0-9\\.]"))
-          ],
-        );
+  NumberSelector({super.key, super.controller, double? defaultValue})
+      : super(defaultValue: defaultValue ?? 0) {
+    _textController = ValueNotifier(value.toString())
+      ..addListener(() {
+        controller.value = double.tryParse(_textSelector.value) ?? 0;
+      });
+    _textSelector = TextSelector(
+      controller: _textController,
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9\\.]"))],
+    );
+  }
 
-  final TextSelector _textSelector;
+  late final ValueNotifier<String> _textController;
+  late final TextSelector _textSelector;
 
   @override
   State<NumberSelector> createState() => _NumberSelectorState();
-
-  @override
-  double get value => double.parse(_textSelector.value);
 }
 
 class _NumberSelectorState extends State<NumberSelector> {

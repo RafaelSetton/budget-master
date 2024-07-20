@@ -25,10 +25,10 @@ class TabSelector extends StatefulWidget {
 class _TabSelectorState extends State<TabSelector> {
   int selected = 0;
 
-  double get tabWidth => 100;
+  double get tabWidth => 150;
 
-  double get bodyHeight => 300;
-  double get headerHeight => 30;
+  double get bodyHeight => 400;
+  double get headerHeight => 40;
 
   double get width => max(300, tabWidth * widget.tabs.length);
   Color get defaultColor => AppColors.popUpBackground;

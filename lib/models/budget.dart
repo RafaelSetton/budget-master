@@ -1,9 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:budget_master/models/account.dart';
+import 'package:budget_master/models/category.dart';
 import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/model.dart';
 import 'package:budget_master/models/transaction.dart';
+import 'package:budget_master/services/db.dart';
 import 'package:collection/collection.dart';
 
 class Budget extends Model {
@@ -17,6 +20,12 @@ class Budget extends Model {
   final TimePeriod period;
   final List<String> categories;
   final List<String> accounts;
+
+  List<TransactionCategory> get getCategories =>
+      categories.map((e) => Database.categories.get(e)!).toList();
+
+  List<Account> get getAccounts =>
+      accounts.map((e) => Database.accounts.get(e)!).toList();
 
   int get durationInDays {
     switch (period) {

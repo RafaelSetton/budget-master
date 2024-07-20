@@ -11,23 +11,19 @@ class CategorySingleSelector
     extends CreationFormSelector<TransactionCategory?> {
   CategorySingleSelector(
       {super.key,
-      TransactionCategory? selected,
+      super.controller,
+      TransactionCategory? defaultValue,
       this.allowRoots = false,
       this.optional = true})
-      : _selected = selected ??
-            Database.categories
-                .getAll()
-                .firstOrNull; //((element) => element.children.isEmpty);
+      : super(
+            defaultValue:
+                defaultValue ?? Database.categories.getAll().firstOrNull);
 
-  @override
-  State<CategorySingleSelector> createState() => _CategorySingleSelectorState();
-
-  TransactionCategory? _selected;
   final bool allowRoots;
   final bool optional;
 
   @override
-  TransactionCategory? get value => _selected;
+  State<CategorySingleSelector> createState() => _CategorySingleSelectorState();
 }
 
 class _CategorySingleSelectorState extends State<CategorySingleSelector> {
@@ -43,16 +39,16 @@ class _CategorySingleSelectorState extends State<CategorySingleSelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
           allowRoots: widget.allowRoots,
           optional: widget.optional,
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected?.fullName ?? "Nenhuma",
+      displayText: widget.controller.value?.fullName ?? "Nenhuma",
     );
   }
 }

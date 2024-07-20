@@ -7,18 +7,14 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class GroupSelector extends CreationFormSelector<AccountGroup?> {
-  GroupSelector({super.key, AccountGroup? selected, String? selectedId}) {
-    assert(selected == null || selectedId == null);
-    _selected = selected ?? Database.groups.get(selectedId);
-  }
-
-  late AccountGroup? _selected;
+  GroupSelector(
+      {super.key,
+      ValueNotifier<AccountGroup?>? controller,
+      AccountGroup? defaultValue})
+      : super(controller: controller ?? ValueNotifier(defaultValue));
 
   @override
   State<GroupSelector> createState() => _GroupSelectorState();
-
-  @override
-  AccountGroup? get value => _selected;
 }
 
 class _GroupSelectorState extends State<GroupSelector> {
@@ -34,14 +30,14 @@ class _GroupSelectorState extends State<GroupSelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected?.name ?? "Nenhum",
+      displayText: widget.controller.value?.name ?? "Nenhum",
     );
   }
 }

@@ -10,17 +10,11 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class AccountMultiSelector extends CreationFormSelector<List<Account>> {
-  AccountMultiSelector({super.key, List<Account>? selected}) {
-    _selected = selected ?? [];
-  }
+  AccountMultiSelector(
+      {super.key, super.controller, super.defaultValue = const []});
 
   @override
   State<AccountMultiSelector> createState() => _AccountMultiSelectorState();
-
-  late List<Account> _selected;
-
-  @override
-  List<Account> get value => _selected;
 }
 
 class _AccountMultiSelectorState extends State<AccountMultiSelector> {
@@ -36,14 +30,14 @@ class _AccountMultiSelectorState extends State<AccountMultiSelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: "${widget._selected.length} selecionadas",
+      displayText: "${widget.controller.value.length} selecionadas",
     );
   }
 }
@@ -260,8 +254,7 @@ class __SelectorDialogState extends State<_SelectorDialog> {
       }
     } else if (expanded[group.id]!) {
       // Matches search and is expanded
-      for (String id in group.accounts) {
-        Account acc = Database.accounts.get(id)!;
+      for (Account acc in group.getAccounts) {
         if (matches(acc)) {
           res.add(acc);
         }

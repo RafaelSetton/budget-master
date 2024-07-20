@@ -6,13 +6,8 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class CurrencySelector extends CreationFormSelector<Currency> {
-  CurrencySelector({super.key, Currency? selected})
-      : _selected = selected ?? Currency.brl;
-
-  late Currency _selected;
-
-  @override
-  Currency get value => _selected;
+  CurrencySelector({super.key, super.controller, Currency? defaultValue})
+      : super(defaultValue: defaultValue ?? Currency.brl);
 
   @override
   State<StatefulWidget> createState() => _CurrencySelectorState();
@@ -31,14 +26,14 @@ class _CurrencySelectorState extends State<CurrencySelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.name.toUpperCase(),
+      displayText: widget.controller.value.name.toUpperCase(),
     );
   }
 }

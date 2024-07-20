@@ -2,11 +2,16 @@ import 'package:budget_master/models/model.dart';
 import 'package:budget_master/services/db.dart';
 import 'package:collection/collection.dart';
 
+// TODO (Categories) Expense vs Income
+
 class TransactionCategory extends Model {
   final String _id;
   final String parent;
   final List<String> children;
   late final String fullName;
+
+  List<TransactionCategory> get getChildren =>
+      children.map((e) => Database.categories.get(e)!).toList();
 
   @override
   String get id => _id;

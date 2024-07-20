@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class BoolSelector extends CreationFormSelector {
-  BoolSelector({super.key, bool? isChecked}) : _isChecked = isChecked ?? false;
+  BoolSelector({super.key, super.controller, super.defaultValue = false});
 
   @override
   State<BoolSelector> createState() => _BoolSelectorState();
-
-  bool _isChecked;
-
-  @override
-  get value => _isChecked;
 }
 
 class _BoolSelectorState extends State<BoolSelector> {
@@ -36,10 +31,10 @@ class _BoolSelectorState extends State<BoolSelector> {
     return Checkbox(
       checkColor: Colors.black,
       fillColor: MaterialStateColor.resolveWith(getColor),
-      value: widget._isChecked,
+      value: widget.controller.value,
       onChanged: (bool? value) {
         setState(() {
-          widget._isChecked = value!;
+          widget.controller.value = value!;
         });
       },
     );

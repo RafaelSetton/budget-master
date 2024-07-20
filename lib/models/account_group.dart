@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:budget_master/models/account.dart';
 import 'package:budget_master/models/model.dart';
+import 'package:budget_master/services/db.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,9 @@ class AccountGroup extends Model {
   final String _id;
   List<String> accounts;
   MaterialColor color;
+
+  List<Account> get getAccounts =>
+      accounts.map((e) => Database.accounts.get(e)!).toList();
 
   AccountGroup({
     String? id,

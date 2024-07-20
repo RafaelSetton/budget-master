@@ -10,8 +10,7 @@ class GroupEditDialog extends EditDialog {
           onSubmit: (d) {
             Database.groups.edit(
               id,
-              (p1) => p1.copyWith(
-                  name: d['name'], color: Colors.primaries[d['color']]),
+              (p1) => p1.copyWith(name: d['name'], color: d['color']),
             );
             Future.delayed(Durations.long2, Navigator.of(context).pop);
           },

@@ -6,13 +6,8 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class TimePeriodSelector extends CreationFormSelector<TimePeriod> {
-  TimePeriodSelector({super.key, TimePeriod? selected})
-      : _selected = selected ?? TimePeriod.month;
-
-  late TimePeriod _selected;
-
-  @override
-  TimePeriod get value => _selected;
+  TimePeriodSelector(
+      {super.key, super.controller, super.defaultValue = TimePeriod.month});
 
   @override
   State<StatefulWidget> createState() => _TimePeriodSelectorState();
@@ -31,14 +26,14 @@ class _TimePeriodSelectorState extends State<TimePeriodSelector> {
         context: ctx,
         builder: (_, offset) => _SelectorDialog(
           offset: offset,
-          selected: widget._selected,
+          selected: widget.controller.value,
           onChange: (acc) => setState(() {
-            widget._selected = acc;
+            widget.controller.value = acc;
           }),
         ),
         buttonHeight: height,
       ),
-      displayText: widget._selected.display,
+      displayText: widget.controller.value.display,
     );
   }
 }

@@ -4,16 +4,11 @@ import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class DateSelector extends CreationFormSelector<DateTime> {
-  DateSelector({super.key, DateTime? initialDate})
-      : _date = initialDate ?? DateTime.now();
+  DateSelector({super.key, super.controller, DateTime? defaultValue})
+      : super(defaultValue: defaultValue ?? DateTime.now());
 
   @override
   State<DateSelector> createState() => _DateSelectorState();
-
-  DateTime _date;
-
-  @override
-  DateTime get value => _date;
 }
 
 class _DateSelectorState extends State<DateSelector> {
@@ -25,13 +20,13 @@ class _DateSelectorState extends State<DateSelector> {
           context: context,
           firstDate: DateTime.fromMillisecondsSinceEpoch(0),
           lastDate: DateTime(3000),
-          initialDate: widget._date,
+          initialDate: widget.controller.value,
         );
         date.then((value) => setState(() {
-              if (value != null) widget._date = value;
+              if (value != null) widget.controller.value = value;
             }));
       },
-      child: Text(DateFormat("dd/MM/yyyy").format(widget._date)),
+      child: Text(DateFormat("dd/MM/yyyy").format(widget.controller.value)),
     );
   }
 }
