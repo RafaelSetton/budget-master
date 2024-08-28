@@ -1,7 +1,9 @@
 import 'package:budget_master/components/adjustableTable/header.dart';
+import 'package:budget_master/models/enums.dart';
 import 'package:budget_master/models/transaction.dart';
 import 'package:budget_master/pages/edit/transaction.dart';
 import 'package:budget_master/utils/app_colors.dart';
+import 'package:budget_master/utils/app_sizes.dart';
 import 'package:flutter/material.dart';
 
 class AdjustableTable extends StatefulWidget {
@@ -61,6 +63,16 @@ class _AdjustableTableState extends State<AdjustableTable> {
     int index = e.key;
     Transaction transaction = e.value;
     Map<String, dynamic> attrs = transaction.display();
+    Color valueColor;
+    if (transaction.type == TransactionType.expense ||
+        transaction.type == TransactionType.buy) {
+      valueColor = Colors.red;
+    } else if (transaction.type == TransactionType.income ||
+        transaction.type == TransactionType.sell) {
+      valueColor = Colors.green;
+    } else {
+      valueColor = Colors.black;
+    }
 
     return GestureDetector(
       onSecondaryTap: () {
@@ -81,7 +93,9 @@ class _AdjustableTableState extends State<AdjustableTable> {
                 child: Text(
                   attrs[e.text],
                   overflow: TextOverflow.ellipsis,
-                  // TODO (Transaction Display) Color Value
+                  style: TextStyle(
+                    color: e.text == "Valor" ? valueColor : null,
+                  ),
                 ),
               ),
             )
@@ -90,23 +104,35 @@ class _AdjustableTableState extends State<AdjustableTable> {
     );
   }
 
+  ScrollController horizontalScroller = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     List<Widget> rows =
         widget.transactions.asMap().entries.map(transactionRow).toList();
 
-    //TODO (2D Scroll)
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        headerRow,
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(children: rows),
-          ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      controller: horizontalScroller,
+      child: SizedBox(
+        height: AppSizes.window.height,
+        width: AppSizes.window.width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            headerRow,
+            Expanded(
+              child: SingleChildScrollView(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: horizontalScroller,
+                  child: Column(children: rows),
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
